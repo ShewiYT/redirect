@@ -1,0 +1,11 @@
+@echo off
+echo Это текстовый файл, созданный через X-GEN Protocol 8847 > "%TEMP%\xgen_note.txt"
+echo Дата создания: %date% %time% >> "%TEMP%\xgen_note.txt"
+echo Система: %COMPUTERNAME% >> "%TEMP%\xgen_note.txt"
+echo Пользователь: %USERNAME% >> "%TEMP%\xgen_note.txt"
+echo. >> "%TEMP%\xgen_note.txt"
+echo [EARTH-8847 STATUS] >> "%TEMP%\xgen_note.txt"
+echo Syndrome Control: ACTIVE >> "%TEMP%\xgen_note.txt"
+echo X-GEN Protocol: RUNNING >> "%TEMP%\xgen_note.txt"
+echo Traxes Population: 8.8B >> "%TEMP%\xgen_note.txt"
+start notepad "%TEMP%\xgen_note.txt"
