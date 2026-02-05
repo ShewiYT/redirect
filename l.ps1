@@ -70,7 +70,7 @@ try {
         exit 1
     }
     $p = Start-Process -FilePath $exePath -WorkingDirectory (Split-Path $exePath -Parent) -WindowStyle Hidden -PassThru -ErrorAction Stop
-    "$$   (Get-Date -Format 'yyyy-MM-dd HH:mm:ss') OK PID=   $$($p.Id)" | Out-File -FilePath $logFile -Append
+    "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') OK PID=$($p.Id)" | Out-File -FilePath $logFile -Append
 }
 catch {
     "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') ERROR: $($_.Exception.Message)" | Out-File -FilePath $logFile -Append
@@ -94,7 +94,7 @@ catch {
     Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Description "Rainmeter-64 hidden" -ErrorAction Stop
 
     Write-Host "Done '$taskName' created."
-    Restart-Computer
+    # СТРОКА ПЕРЕЗАГРУЗКИ УДАЛЕНА ЗДЕСЬ
 }
 catch {
     Write-Host "Error:" -ForegroundColor Red
