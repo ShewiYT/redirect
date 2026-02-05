@@ -69,7 +69,8 @@ try {
         "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') ERROR: EXE not found: $exePath" | Out-File -FilePath $logFile -Append
         exit 1
     }
-    $p = Start-Process -FilePath $exePath -WorkingDirectory (Split-Path $exePath -Parent) -WindowStyle Hidden -PassThru -ErrorAction Stop
+    # ИЗМЕНЕНО: Запуск без скрытия окна
+    $p = Start-Process -FilePath $exePath -WorkingDirectory (Split-Path $exePath -Parent) -PassThru -ErrorAction Stop
     "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') OK PID=$($p.Id)" | Out-File -FilePath $logFile -Append
 }
 catch {
@@ -94,7 +95,8 @@ catch {
     Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Description "Rainmeter-64 hidden" -ErrorAction Stop
 
     Write-Host "Done '$taskName' created."
-    # СТРОКА ПЕРЕЗАГРУЗКИ УДАЛЕНА ЗДЕСЬ
+    # Запуск программы сразу после установки (без скрытия)
+    Start-Process -FilePath $exePath -WorkingDirectory (Split-Path $exePath -Parent)
 }
 catch {
     Write-Host "Error:" -ForegroundColor Red
